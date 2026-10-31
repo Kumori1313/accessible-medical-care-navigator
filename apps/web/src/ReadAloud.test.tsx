@@ -37,11 +37,16 @@ function fakeEngine() {
 it("does not speak until pressed, then offers pause/stop and announces state", async () => {
   const { engine, spoken, synth } = fakeEngine();
   const { container } = render(
-    <ReadAloud chunks={["One.", "Two."]} engine={engine} />,
+    <ReadAloud
+      chunks={["One.", "Two."]}
+      rate={1.5}
+      voiceURI=""
+      onChange={() => {}}
+      engine={engine}
+    />,
   );
   expect(spoken).toHaveLength(0);
 
-  await userEvent.selectOptions(screen.getByLabelText("Speed"), "1.5");
   await userEvent.click(screen.getByRole("button", { name: "Read aloud" }));
   expect(spoken.map((u) => u.text)).toEqual(["One.", "Two."]);
   expect(spoken[0]!.rate).toBe(1.5);
@@ -59,11 +64,45 @@ it("does not speak until pressed, then offers pause/stop and announces state", a
 
 it("stops speaking when removed from the page", () => {
   const { engine, synth } = fakeEngine();
-  render(<ReadAloud chunks={["One."]} engine={engine} />).unmount();
+  render(
+    <ReadAloud
+      chunks={["One."]}
+      rate={1}
+      voiceURI=""
+      onChange={() => {}}
+      engine={engine}
+    />,
+  ).unmount();
   expect(synth.cancel).toHaveBeenCalled();
 });
 
 it("explains when speech is unavailable", () => {
-  render(<ReadAloud chunks={["One."]} engine={null} />);
+  render(
+    <ReadAloud
+      chunks={["One."]}
+      rate={1}
+      voiceURI=""
+      onChange={() => {}}
+      engine={null}
+    />,
+  );
   expect(screen.getByText(/not available in this browser/)).toBeInTheDocument();
+});
+
+it("reports speed and voice changes to the owner", async () => {
+  const onChange = vi.fn();
+  const { engine } = fakeEngine();
+  render(
+    <ReadAloud
+      chunks={["One."]}
+      rate={1}
+      voiceURI=""
+      onChange={onChange}
+      engine={engine}
+    />,
+  );
+  await userEvent.selectOptions(screen.getByLabelText("Speed"), "1.25");
+  expect(onChange).toHaveBeenCalledWith({ rate: 1.25, voiceURI: "" });
+  await userEvent.selectOptions(screen.getByLabelText("Voice"), "b");
+  expect(onChange).toHaveBeenLastCalledWith({ rate: 1, voiceURI: "b" });
 });
