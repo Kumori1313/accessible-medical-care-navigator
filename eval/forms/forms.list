@@ -1,0 +1,16 @@
+# id|origin|url   (the sites that return HTTP 403 to scripts are listed in MANIFEST.md instead)
+cms-1500-claim-form|federal|https://www.cms.gov/medicare/cms-forms/cms-forms/downloads/cms1500.pdf
+medicare-summary-notice-part-a|federal|https://www.cms.gov/medicare/medicare-general-information/msn/downloads/sample-part-a-medicare-summary-notice.pdf
+good-faith-estimate|federal|https://www.cms.gov/files/document/good-faith-estimate-example.pdf
+sample-eob|federal|https://www.cms.gov/files/document/11819-sample-explanation-benefits-508.pdf
+va-10-10ez-health-benefits|federal|https://www.va.gov/vaforms/medical/pdf/VA%20Form%2010-10EZ.pdf
+marketplace-application|federal|https://www.cms.gov/marketplace/applications-and-forms/marketplace-application-for-family.pdf
+hipaa-authorization-cms-10106|federal|https://www.cms.gov/medicare/cms-forms/cms-forms/downloads/cms10106.pdf
+hipaa-authorization-va-10-5345|federal|https://www.va.gov/vaforms/medical/pdf/va_form_10-5345_fillable.pdf
+advance-directive-va-10-0137|federal|https://www.va.gov/vaforms/medical/pdf/VA%20Form-10-0137.pdf
+research-consent-niaid-daids|federal|https://www.niaid.nih.gov/sites/default/files/daids-specific-general-icf_v4.pdf
+intake-va-mental-health|federal|https://www.va.gov/files/2022-11/intake_packet.pdf
+intake-patient-registration|federal|https://ors.od.nih.gov/ser/dpsac/administrators/onboarding-new-staff/info-for-fellows-and-summer-interns/Documents/WRNMMC_Fellows_Patient_Registration_Form.pdf
+prior-auth-texas-nofr001|state|https://www.tdi.texas.gov/forms/lhlifehealth/nofr001.pdf
+advance-directive-california|state|https://oag.ca.gov/system/files/media/ProbateCodeAdvanceHealthCareDirectiveForm-fillable.pdf
+vaccine-information-statement-flu|federal (CDC text, hosted by immunize.org)|https://www.immunize.org/wp-content/uploads/vis/flu_inactive.pdf
