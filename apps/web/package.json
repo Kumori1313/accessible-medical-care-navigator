@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:a11y": "playwright test"
+    "test:a11y": "playwright test",
+    "build:desktop": "tsc --noEmit && VITE_NATIVE=1 vite build --outDir dist-desktop",
+    "build:mobile": "tsc --noEmit && VITE_NATIVE=1 vite build --outDir dist-mobile"
   },
   "dependencies": {
     "@amcn/core": "workspace:*",

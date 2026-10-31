@@ -1,6 +1,8 @@
+import os
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from .explain import Explanation, ExplanationError, ReadingLevel, explain_document
@@ -12,6 +14,32 @@ MAX_UPLOAD_BYTES = 15 * 1024 * 1024
 LOW_CONFIDENCE = 70.0
 
 app = FastAPI(title="Accessible Medical Care Navigator API")
+
+# Native shells load the app from their own origin, so the browser enforces CORS against this API.
+# Only those origins are allowed by default; the website uses the same-origin /api proxy.
+# Override with AMCN_CORS_ORIGINS (comma-separated) when serving the web app from elsewhere.
+DEFAULT_CORS_ORIGINS = [
+    "tauri://localhost",  # Tauri on macOS/Linux
+    "http://tauri.localhost",  # Tauri on Windows
+    "https://tauri.localhost",
+    "https://localhost",  # Capacitor Android (androidScheme: https)
+    "capacitor://localhost",  # Capacitor iOS
+]
+
+
+def cors_origins() -> list[str]:
+    raw = os.environ.get("AMCN_CORS_ORIGINS")
+    if raw is None:
+        return DEFAULT_CORS_ORIGINS
+    return [o.strip() for o in raw.split(",") if o.strip()]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins(),
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 
 
 def get_provider() -> LLMProvider:

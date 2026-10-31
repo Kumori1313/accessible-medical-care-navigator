@@ -35,7 +35,8 @@ import { type VaultApi, useVault } from "./useVault";
 
 type Step = "choose" | "review" | "explained";
 
-const defaultApi = createApi();
+// Same-origin "/api" for the website/PWA; native shells are built with VITE_API_BASE_URL set.
+const defaultApi = createApi(import.meta.env.VITE_API_BASE_URL || "/api");
 
 type PreferencesStore = ReturnType<typeof createPreferencesStore>;
 

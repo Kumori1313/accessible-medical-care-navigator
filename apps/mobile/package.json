@@ -1,0 +1,19 @@
+{
+  "name": "@amcn/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cap": "cap",
+    "web": "pnpm --filter @amcn/web build:mobile",
+    "sync": "pnpm web && cap sync android",
+    "android:debug": "pnpm sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0"
+  }
+}
