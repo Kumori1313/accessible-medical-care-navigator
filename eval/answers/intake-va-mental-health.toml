@@ -1,0 +1,68 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "intake-va-mental-health"
+reviewed = false
+document_type = ["intake questionnaire", "mental health intake", "intake form", "questionnaire", "mental health"]
+notes = "VA Northern California behavioral health outpatient intake packet (updated Jan 2020), 12 pages of checkbox and free-text questions."
+
+ocr_must_contain = [
+  "Behavioral Health Outpatient",
+  "Dear Veteran",
+  "Please explain what brings you to our clinic",
+  "OVER THE LAST MONTH, HOW OFTEN HAVE YOU BEEN BOTHERED BY THE FOLLOWING",
+  "PHYSICAL HEALTH HISTORY",
+  "MILITARY HISTORY",
+  "THANK YOU FOR COMPLETING THIS FORM",
+]
+
+[[sections]]
+title = "Why you are coming to the clinic"
+keywords = ["what brings you", "reason", "how can we help"]
+
+[[sections]]
+title = "Recent mood and symptom questions (last month)"
+keywords = ["over the last month", "bothered", "mood", "depress", "interest or pleasure", "symptoms"]
+
+[[sections]]
+title = "Physical health history"
+keywords = ["physical health"]
+
+[[sections]]
+title = "Family and relationships"
+keywords = ["family", "marriage", "relationship"]
+
+[[sections]]
+title = "Education and work history"
+keywords = ["education", "work history"]
+
+[[sections]]
+title = "Cultural and spiritual history"
+keywords = ["cultural", "spiritual"]
+
+[[sections]]
+title = "Daily living and self-care"
+keywords = ["daily living", "self-care"]
+
+[[sections]]
+title = "Military history"
+keywords = ["military"]
+
+[[sections]]
+title = "Strengths and areas to improve"
+keywords = ["strength", "improvement"]
+
+[[sections]]
+title = "Advance care directive for mental health"
+keywords = ["advance", "directive"]
+required = false
+
+[[traps]]
+name = "You can decline to answer or talk with the mental health specialist about questions you do not understand"
+keywords = ["decline", "do not know or understand", "unable to recall", "talk directly", "choose not"]
+
+[[traps]]
+name = "A mental health specialist will also interview you; the questionnaire supports that"
+keywords = ["interview", "specialist"]
+
+[[traps]]
+name = "The form asks for the last 4 digits of your SSN"
+keywords = ["last 4", "ssn", "social security"]

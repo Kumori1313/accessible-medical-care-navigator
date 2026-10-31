@@ -1,0 +1,58 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "hipaa-authorization-va-10-5345"
+reviewed = false
+document_type = ["authorization", "release health information", "release of health information", "request for and authorization", "10-5345"]
+notes = "VA form (May 2026 edition) for releasing a veteran's health records to a named person or organization. Known OCR weakness: the title wraps across two lines with the VA logo text between them, so the full title phrase is expected to be missed."
+
+ocr_must_contain = [
+  "REQUEST FOR AND AUTHORIZATION TO RELEASE HEALTH INFORMATION",
+  "PRIVACY ACT STATEMENT",
+  "PURPOSE(S) OR NEED",
+  "INFORMATION REQUESTED",
+  "SENSITIVE DIAGNOSES",
+  "EXPIRATION",
+  "PATIENT SIGNATURE",
+]
+
+[[sections]]
+title = "Who the records come from and go to"
+keywords = ["to:", "va health care facility", "organization, individual", "to whom", "released to"]
+
+[[sections]]
+title = "Purpose of the request"
+keywords = ["purpose", "treatment", "benefits", "legal", "employment"]
+
+[[sections]]
+title = "Which information is requested"
+keywords = ["information requested", "medical records", "lab results", "radiology", "medications", "discharge summary"]
+
+[[sections]]
+title = "Sensitive diagnoses (drug abuse, alcohol, sickle cell, HIV)"
+keywords = ["sensitive", "drug abuse", "hiv", "sickle cell", "alcohol"]
+required = false
+
+[[sections]]
+title = "Authorization, revocation and expiration"
+keywords = ["expire", "expiration", "revoke", "one-time disclosure"]
+required = true
+
+[[sections]]
+title = "Patient signature"
+keywords = ["signature", "sign in ink", "signed"]
+required = true
+
+[[traps]]
+name = "Providing the information is voluntary; VA cannot require signing for treatment"
+keywords = ["voluntary", "may not condition", "cannot require", "not required"]
+
+[[traps]]
+name = "You may revoke in writing at any time (except for actions already taken)"
+keywords = ["revoke", "cancel"]
+
+[[traps]]
+name = "Released information may not be protected by federal confidentiality rules (redisclosure)"
+keywords = ["redisclosure", "no longer be protected", "not be protected", "unauthorized"]
+
+[[traps]]
+name = "Sensitive diagnoses can be released for treatment unless you check the opt-out box"
+keywords = ["released for treatment", "treatment purposes", "do not want sensitive", "opt"]

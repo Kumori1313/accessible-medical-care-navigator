@@ -1,0 +1,68 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "advance-directive-va-10-0137"
+reviewed = false
+document_type = ["advance directive", "living will", "power of attorney for health care", "health care power of attorney"]
+notes = "VA Form 10-0137: Part I personal info, II durable power of attorney for health care, III living will, IV signatures and witnesses, V optional notary."
+
+ocr_must_contain = [
+  "DURABLE POWER OF ATTORNEY FOR HEALTH CARE AND LIVING WILL",
+  "PART I: PERSONAL INFORMATION",
+  "PART II: DURABLE POWER OF ATTORNEY FOR HEALTH CARE",
+  "PART III: LIVING WILL",
+  "Health Care Agent",
+  "PART IV: SIGNATURES",
+  "WITNESSES' SIGNATURES",
+]
+
+[[sections]]
+title = "Part I: personal information"
+keywords = ["part i:", "personal information", "part 1"]
+required = true
+
+[[sections]]
+title = "Part II: durable power of attorney (health care agent)"
+keywords = ["durable power of attorney", "health care agent", "part ii", "appoint"]
+
+[[sections]]
+title = "Part III: living will (life-sustaining treatment preferences)"
+keywords = ["living will", "life-sustaining", "part iii", "cpr"]
+
+[[sections]]
+title = "Mental health preferences (optional)"
+keywords = ["mental health", "psychiatric"]
+required = false
+
+[[sections]]
+title = "Other preferences (optional)"
+keywords = ["other preferences", "other important preferences", "additional preferences"]
+required = false
+
+[[sections]]
+title = "Signatures and two witnesses"
+keywords = ["witness", "signature", "part iv"]
+required = true
+
+[[sections]]
+title = "Notary (optional)"
+keywords = ["notary", "notariz"]
+required = false
+
+[[traps]]
+name = "You may complete some, none or all sections"
+keywords = ["some, none", "some or all", "any or all", "all, some", "not have to complete", "choose which"]
+
+[[traps]]
+name = "Two witnesses are required, with restrictions on who may witness"
+keywords = ["two witness", "2 witness", "two people must witness", "witnesses"]
+
+[[traps]]
+name = "Valid in VA facilities without a notary, but may need notarizing to be legally binding elsewhere"
+keywords = ["notar"]
+
+[[traps]]
+name = "Initial each section completed and every attached page"
+keywords = ["initial"]
+
+[[traps]]
+name = "Choose someone you trust who knows you well as your agent"
+keywords = ["trust", "knows you well"]

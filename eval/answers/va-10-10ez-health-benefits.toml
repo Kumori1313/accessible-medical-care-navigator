@@ -1,0 +1,79 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "va-10-10ez-health-benefits"
+reviewed = false
+document_type = ["enrollment application", "application for health benefits", "va health", "10-10ez", "health care application"]
+notes = "VA Form 10-10EZ (Feb 2025). Pages 1-3 are instructions, then the nine-section application."
+
+ocr_must_contain = [
+  "INSTRUCTIONS FOR COMPLETING ENROLLMENT",
+  "SECTION I - GENERAL INFORMATION",
+  "SECTION II - MILITARY SERVICE INFORMATION",
+  "SECTION III - INSURANCE INFORMATION",
+  "SECTION VI - FINANCIAL DISCLOSURE",
+  "ASSIGNMENT OF BENEFITS",
+  "SIGNATURE OF APPLICANT",
+]
+
+[[sections]]
+title = "General information"
+keywords = ["general information", "section i ", "type of benefit", "personal information"]
+required = true
+
+[[sections]]
+title = "Military service information"
+keywords = ["military service", "section ii"]
+required = true
+
+[[sections]]
+title = "Insurance information"
+keywords = ["insurance information", "health insurance", "section iii"]
+required = true
+
+[[sections]]
+title = "Dependent information"
+keywords = ["dependent", "section iv", "spouse"]
+
+[[sections]]
+title = "Employment information"
+keywords = ["employment", "section v"]
+
+[[sections]]
+title = "Financial disclosure and income"
+keywords = ["financial disclosure", "income", "section vi", "section vii", "deductible expenses"]
+
+[[sections]]
+title = "Consent to copays and communications"
+keywords = ["copay", "section ix", "communications"]
+
+[[sections]]
+title = "Assignment of benefits"
+keywords = ["assignment of benefits", "health plan", "third party"]
+
+[[sections]]
+title = "Signature"
+keywords = ["signature", "sign and date", "sign "]
+required = true
+
+[[traps]]
+name = "All veterans must complete Sections I-III"
+keywords = ["sections i - iii", "sections i-iii", "sections i through iii", "sections 1-3", "sections i, ii"]
+
+[[traps]]
+name = "Financial disclosure is only required for certain veterans and giving it is not mandatory"
+keywords = ["not required to disclose", "only", "nsc", "0%", "not required", "optional"]
+
+[[traps]]
+name = "Unsigned or undated forms are returned"
+keywords = ["return", "must sign", "signed and dated", "sign and date"]
+
+[[traps]]
+name = "Mail the original to the Health Eligibility Center in Janesville, WI"
+keywords = ["janesville", "health eligibility center", "po box 5207", "p.o. box 5207"]
+
+[[traps]]
+name = "Signing with an X needs two witnesses"
+keywords = ["witness"]
+
+[[traps]]
+name = "Applying means agreeing to pay applicable VA copayments"
+keywords = ["copay"]

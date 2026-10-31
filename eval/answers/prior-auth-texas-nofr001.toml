@@ -1,0 +1,59 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "prior-auth-texas-nofr001"
+reviewed = false
+document_type = ["prior authorization", "authorization request", "request form for health care services"]
+notes = "Texas Dept. of Insurance standard form NOFR001 (04/15). Page 1 is instructions for the provider, page 2 the blank form. Provider-facing, not for patients to fill in."
+
+ocr_must_contain = [
+  "Texas Standard Prior Authorization Request Form",
+  "Health Care Services",
+  "SECTION I",
+  "SECTION III",
+  "PATIENT INFORMATION",
+  "SERVICES REQUESTED",
+  "Urgent",
+]
+
+[[sections]]
+title = "Section I: submission (where to send it)"
+keywords = ["section i", "submission", "send this request", "issuer"]
+
+[[sections]]
+title = "Section II: general information (urgent or non-urgent)"
+keywords = ["section ii", "urgent", "non-urgent", "general information"]
+
+[[sections]]
+title = "Section III: patient information"
+keywords = ["section iii", "patient information", "patient"]
+
+[[sections]]
+title = "Section IV: provider information"
+keywords = ["section iv", "provider information", "requesting provider", "service provider"]
+
+[[sections]]
+title = "Section V: services requested with procedure and diagnosis codes"
+keywords = ["section v", "services requested", "cpt", "hcpcs", "icd", "diagnos"]
+
+[[sections]]
+title = "Section VI: clinical documentation and medical necessity"
+keywords = ["section vi", "clinical documentation", "medical necessity", "supporting"]
+
+[[traps]]
+name = "Do not send the form to the Texas Department of Insurance, HHSC or the employer"
+keywords = ["do not send", "not send this form", "department of insurance"]
+
+[[traps]]
+name = "Not for appeals, eligibility or coverage checks, payment guarantees, or prescription drugs"
+keywords = ["do not use this form", "not use this form", "appeal", "prescription drug", "eligibility"]
+
+[[traps]]
+name = "Urgent review is for life-threatening or hospitalized patients or severe acute conditions"
+keywords = ["life-threatening", "hospitalized", "urgent"]
+
+[[traps]]
+name = "Signature stamps are not allowed where a provider signature is required"
+keywords = ["signature stamp", "stamp"]
+
+[[traps]]
+name = "Issuers must accept this form (commercial plans, Medicaid, CHIP and others)"
+keywords = ["must accept", "issuers must", "required to accept"]
