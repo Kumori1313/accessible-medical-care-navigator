@@ -14,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from ..explain import ReadingLevel
-from ..ocr import run_ocr
+from ..ocr import ocr_cache_tag, run_ocr
 from ..providers import LLMProvider, ProviderNotConfiguredError, provider_from_env
 from .degrade import VARIANTS, degrade_bytes
 from .keys import AnswerKeyError, load_keys
@@ -80,6 +80,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         "Reading level": level,
         "Variants": args.variants,
         "Pages per document": str(args.max_pages or "all"),
+        "OCR cleanup": ocr_cache_tag(),
     }
     out = root / "results"
     out.mkdir(parents=True, exist_ok=True)

@@ -50,6 +50,32 @@ they were written from each PDF's text layer (not from OCR), by a model, and hav
 On clean renders OCR finds 98% of the listed phrases; the two misses (CMS-1500 item 21, the VA 10-5345 title)
 are recorded in those keys' notes and are real OCR weaknesses, not key errors.
 
+## OCR image cleanup
+
+Photos are cleaned up before OCR (`services/api/src/amcn_api/imageprep.py`): upscale small images, straighten
+tilted pages, flatten shadows and dim light (only when the page actually has uneven light, because the step can
+erase light text on dark banners), and sharpen. Steps can be switched with `AMCN_OCR_STEPS` (comma list, or `none`);
+the OCR cache is keyed on the cleanup settings, and reports record them.
+
+Experiment (15 forms, first 2 pages each, share of key phrases OCR found; each point is about one phrase, so
+differences of 1-2 points are noise):
+
+| Cleanup | clean | skewed | dim | low-res | blurry | phone | mean |
+|---|---|---|---|---|---|---|---|
+| none | 77 | 67 | 56 | 67 | 61 | 61 | 64.8 |
+| upscale, deskew | 77 | 76 | 54 | 72 | 61 | 70 | 68.3 |
+| + illum (always) | 76 | 74 | 74 | 72 | 63 | 69 | 71.3 |
+| + illum_auto (guarded) | 77 | 76 | 74 | 72 | 61 | 69 | 71.5 |
+| **+ illum_auto, sharpen (default)** | 77 | 76 | 73 | 72 | 63 | 69 | **71.7** |
+
+What it showed: straightening and upscaling help skewed, low-res and phone-style photos; flattening shadows
+is what rescues dim photos (+18 points), but applying it to every page cost the clean EOB 14 points on its own,
+hence the guard; choosing between passes by Tesseract's own confidence did not work (it often prefers the worse
+result), so the decision is made from the page's brightness profile instead. Cost: about 1.5 s more per page
+(1.9 s to 3.4 s). Limits: the "photos" are my synthetic degradations of 15 forms, not real phone photos; blur
+barely improved; perspective distortion and curled pages are not corrected. To re-run an experiment:
+`AMCN_OCR_STEPS=... python -m amcn_api.evalharness run --ocr-only --variants original,dim,phone --max-pages 2 --no-cache`.
+
 ## What is measured
 
 | Metric | Meaning |
