@@ -68,7 +68,11 @@ test("is fully operable by keyboard from the start", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: "Skip to main content" }),
   ).toBeFocused();
-  // Settings sits in the header before the content; the skip link lets users bypass it.
+  // The header buttons come before the content; the skip link lets users bypass them.
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Saved documents" }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "Settings" })).toBeFocused();
   await page.keyboard.press("Tab");

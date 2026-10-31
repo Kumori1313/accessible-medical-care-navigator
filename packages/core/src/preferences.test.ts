@@ -18,6 +18,12 @@ describe("normalizePreferences", () => {
     expect(normalizePreferences({ fontScale: 10 }).fontScale).toBe(3);
     expect(normalizePreferences({ fontScale: 0.1 }).fontScale).toBe(0.75);
     expect(normalizePreferences({ speechRate: Number.NaN }).speechRate).toBe(1);
+    expect(normalizePreferences({ autoLockMinutes: 7 }).autoLockMinutes).toBe(
+      15,
+    );
+    expect(normalizePreferences({ autoLockMinutes: 0 }).autoLockMinutes).toBe(
+      0,
+    );
     const bad = normalizePreferences({
       theme: "neon",
       spacing: 3,

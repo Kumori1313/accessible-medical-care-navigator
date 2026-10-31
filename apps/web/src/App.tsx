@@ -3,11 +3,14 @@ import {
   type Api,
   ApiError,
   type Explanation,
+  type SavedDocument,
   type OcrResult,
   type ReadingLevel,
   applyPreferences,
+  type Vault,
   createApi,
   createPreferencesStore,
+  createVault,
   explanationToSpeech,
 } from "@amcn/core";
 import {
@@ -21,11 +24,14 @@ import {
 } from "@amcn/ui";
 import { useEffect, useRef, useState } from "react";
 import { HighlightedText } from "./HighlightedText";
+import { createIdbStorage, indexedDbAvailable } from "./idbStorage";
 import { Onboarding } from "./Onboarding";
 import { PwaNotices } from "./PwaNotices";
 import { usePwa } from "./pwa";
 import { ReadAloud } from "./ReadAloud";
+import { SavedDocuments } from "./SavedDocuments";
 import { Settings } from "./Settings";
+import { type VaultApi, useVault } from "./useVault";
 
 type Step = "choose" | "review" | "explained";
 
@@ -49,20 +55,34 @@ function browserStore(): PreferencesStore {
 
 const defaultStore = browserStore();
 
+function browserVault(): Vault | null {
+  return indexedDbAvailable() ? createVault(createIdbStorage()) : null;
+}
+
 export function App({
   api = defaultApi,
   store = defaultStore,
+  vault: vaultProp,
 }: {
   api?: Api;
   store?: PreferencesStore;
+  /** Injectable for tests; null means saving is unavailable. */
+  vault?: Vault | null;
 }) {
   const [initial] = useState(() => store.load());
   const [prefs, setPrefs] = useState<AccessPreferences>(initial.preferences);
-  const [view, setView] = useState<"onboarding" | "app" | "settings">(
+  const [view, setView] = useState<"onboarding" | "app" | "settings" | "saved">(
     initial.onboarded ? "app" : "onboarding",
   );
   const [saved, setSaved] = useState(true);
   const pwa = usePwa();
+  const [vaultInstance] = useState(() =>
+    vaultProp !== undefined ? vaultProp : browserVault(),
+  );
+  const vault = useVault(vaultInstance, prefs.autoLockMinutes);
+  const [pendingTitle, setPendingTitle] = useState("");
+  const [savedNotice, setSavedNotice] = useState("");
+  const [fromSaved, setFromSaved] = useState(false);
   const [step, setStep] = useState<Step>("choose");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
@@ -94,6 +114,73 @@ export function App({
   function updatePrefs(next: AccessPreferences) {
     setPrefs(next);
     setSaved(store.save(next));
+  }
+
+  // Saves the waiting document (if any) as soon as the vault opens, whichever way it was opened.
+  const pendingRef = useRef<SavedDocument | null>(null);
+  async function flushPending() {
+    const doc = pendingRef.current;
+    if (!doc) return;
+    pendingRef.current = null;
+    setPendingTitle("");
+    const ok = await vault.save(doc);
+    setSavedNotice(
+      ok ? `Saved “${doc.title}”. Find it under Saved documents.` : "",
+    );
+  }
+  const vaultWithPending: VaultApi = {
+    ...vault,
+    async create(passphrase) {
+      const key = await vault.create(passphrase);
+      if (key) await flushPending();
+      return key;
+    },
+    async unlock(passphrase) {
+      const ok = await vault.unlock(passphrase);
+      if (ok) await flushPending();
+      return ok;
+    },
+    async recover(recoveryKey, newPassphrase) {
+      const ok = await vault.recover(recoveryKey, newPassphrase);
+      if (ok) await flushPending();
+      return ok;
+    },
+  };
+
+  function requestSave() {
+    if (!explanation) return;
+    const date = new Date().toLocaleDateString([], { dateStyle: "medium" });
+    const doc = {
+      title: `${explanation.document_type} (${date})`,
+      text,
+      explanation,
+    };
+    setSavedNotice("");
+    if (vault.status === "unlocked") {
+      void vault
+        .save(doc)
+        .then((ok) =>
+          setSavedNotice(
+            ok ? `Saved “${doc.title}”. Find it under Saved documents.` : "",
+          ),
+        );
+    } else {
+      pendingRef.current = doc;
+      setPendingTitle(doc.title);
+      setView("saved");
+    }
+  }
+
+  async function openSaved(id: string) {
+    const doc = await vault.open(id);
+    if (!doc) return;
+    setText(doc.text);
+    setExplanation(doc.explanation);
+    setSelected(0);
+    setFromSaved(true);
+    setSavedNotice("");
+    setStep("explained");
+    setView("app");
   }
 
   async function run<T>(
@@ -160,13 +247,17 @@ export function App({
       <header>
         <p>Accessible Medical Care Navigator</p>
         {view === "app" && (
-          <Button onPress={() => setView("settings")}>Settings</Button>
+          <nav aria-label="Main">
+            <Button onPress={() => setView("saved")}>Saved documents</Button>{" "}
+            <Button onPress={() => setView("settings")}>Settings</Button>
+          </nav>
         )}
       </header>
       <main id="main" tabIndex={-1}>
         <StatusMessage>{busy || status ? status : null}</StatusMessage>
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <PwaNotices {...pwa} />
+        {view === "app" && <StatusMessage>{savedNotice}</StatusMessage>}
 
         {view === "onboarding" && (
           <Onboarding
@@ -175,6 +266,16 @@ export function App({
               updatePrefs(p);
               setView("app");
             }}
+          />
+        )}
+
+        {view === "saved" && (
+          <SavedDocuments
+            vault={vaultWithPending}
+            pendingTitle={pendingTitle}
+            notice={savedNotice}
+            onOpen={openSaved}
+            onBack={() => setView("app")}
           />
         )}
 
@@ -317,8 +418,26 @@ export function App({
               </div>
             </div>
             <div className="amcn-actions">
-              <Button onPress={() => setStep("review")}>Back to text</Button>{" "}
-              <Button onPress={() => setStep("choose")}>Start over</Button>
+              {!fromSaved && (
+                <Button
+                  onPress={requestSave}
+                  isDisabled={vault.status === "unavailable"}
+                >
+                  Save this document
+                </Button>
+              )}{" "}
+              {!fromSaved && (
+                <Button onPress={() => setStep("review")}>Back to text</Button>
+              )}{" "}
+              <Button
+                onPress={() => {
+                  setFromSaved(false);
+                  setSavedNotice("");
+                  setStep("choose");
+                }}
+              >
+                Start over
+              </Button>
             </div>
           </section>
         )}

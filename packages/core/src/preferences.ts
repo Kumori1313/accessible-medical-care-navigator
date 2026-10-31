@@ -17,6 +17,8 @@ export interface AccessPreferences {
   /** Text-to-speech rate (0.75 - 1.5) and chosen voice ("" = device default). */
   speechRate: number;
   voiceURI: string;
+  /** Minutes of inactivity before saved documents lock again. 0 = only when the page is closed. */
+  autoLockMinutes: number;
 }
 
 export const defaultPreferences: AccessPreferences = {
@@ -29,8 +31,10 @@ export const defaultPreferences: AccessPreferences = {
   readingLevel: "standard",
   speechRate: 1,
   voiceURI: "",
+  autoLockMinutes: 15,
 };
 
+export const AUTO_LOCK_OPTIONS = [5, 15, 30, 60, 0] as const;
 export const FONT_SCALES = [1, 1.25, 1.5, 2] as const;
 const THEMES: Theme[] = ["system", "light", "dark", "high-contrast"];
 const SPACINGS: Spacing[] = ["normal", "relaxed", "wide"];
@@ -60,6 +64,9 @@ export function normalizePreferences(
     readingLevel: oneOf(input.readingLevel, LEVELS, d.readingLevel),
     speechRate: clamp(num(input.speechRate, d.speechRate), 0.5, 2),
     voiceURI: typeof input.voiceURI === "string" ? input.voiceURI : d.voiceURI,
+    autoLockMinutes: AUTO_LOCK_OPTIONS.includes(input.autoLockMinutes as never)
+      ? (input.autoLockMinutes as number)
+      : d.autoLockMinutes,
   };
 }
 

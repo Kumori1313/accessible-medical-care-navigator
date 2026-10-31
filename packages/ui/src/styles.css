@@ -191,3 +191,13 @@ header {
   gap: 0.5rem;
   padding: 0 1rem;
 }
+.amcn-recovery {
+  display: block;
+  font-family: ui-monospace, monospace;
+  font-size: 1.25em;
+  letter-spacing: 0.1em;
+  padding: 0.75rem;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  user-select: all;
+}
