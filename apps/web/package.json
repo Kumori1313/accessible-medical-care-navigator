@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:a11y": "playwright test",
-    "build:desktop": "tsc --noEmit && VITE_NATIVE=1 vite build --outDir dist-desktop",
-    "build:mobile": "tsc --noEmit && VITE_NATIVE=1 vite build --outDir dist-mobile"
+    "build:desktop": "tsc --noEmit && vite build --mode desktop --outDir dist-desktop",
+    "build:mobile": "tsc --noEmit && vite build --mode mobile --outDir dist-mobile"
   },
   "dependencies": {
     "@amcn/core": "workspace:*",

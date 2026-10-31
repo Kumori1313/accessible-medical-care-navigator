@@ -1,0 +1,139 @@
+name: Desktop release
+# Builds the Windows installer, proves it installs and launches, and (on a version tag or a manual run
+# with a tag) attaches it to a DRAFT pre-release. Publishing the draft is a deliberate manual step.
+on:
+  pull_request:
+    paths:
+      - "apps/desktop/**"
+      - "apps/web/package.json"
+      - "apps/web/vite.config.ts"
+      - "apps/web/.env.*"
+      - ".github/workflows/release-desktop.yml"
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create or update (e.g. v0.1.0). Leave empty to only build and test."
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+      - run: pnpm install --frozen-lockfile
+      - name: Build the installer
+        run: pnpm --filter @amcn/desktop exec tauri build --bundles nsis
+
+      - name: Collect the installer
+        id: pack
+        run: |
+          version=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          src=$(ls apps/desktop/src-tauri/target/release/bundle/nsis/*-setup.exe | head -n 1)
+          mkdir -p dist
+          out="dist/Care-Navigator-${version}-windows-x64-setup.exe"
+          cp "$src" "$out"
+          sha=$(sha256sum "$out" | cut -d' ' -f1)
+          echo "$sha  $(basename "$out")" > "$out.sha256"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "file=$out" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          ls -l dist
+
+      - name: Smoke test (install silently, launch, screenshot, uninstall)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $installer = (Resolve-Path "${{ steps.pack.outputs.file }}").Path
+          $target = 'C:\cn-smoke'
+
+          Start-Process -FilePath $installer -ArgumentList '/S', "/D=$target" -Wait
+          $exe = Get-ChildItem $target -Filter *.exe -Recurse |
+            Where-Object { $_.Name -notmatch 'uninstall' } | Select-Object -First 1
+          if (-not $exe) { throw "No application executable found under $target after install" }
+          Write-Host "Installed: $($exe.FullName)"
+
+          $app = Start-Process -FilePath $exe.FullName -PassThru
+          Start-Sleep -Seconds 25
+          if ($app.HasExited) { throw "The app exited early with code $($app.ExitCode)" }
+          Write-Host "App is running (pid $($app.Id))"
+          $webview = Get-Process msedgewebview2 -ErrorAction SilentlyContinue
+          Write-Host "WebView2 processes: $(@($webview).Count)"
+
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $bounds = [System.Windows.Forms.SystemInformation]::VirtualScreen
+          $bmp = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+          $gfx = [System.Drawing.Graphics]::FromImage($bmp)
+          $gfx.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+          New-Item -ItemType Directory -Force dist | Out-Null
+          $bmp.Save("dist/smoke-screenshot.png")
+
+          Stop-Process -Id $app.Id -Force
+          $uninstaller = Join-Path $target 'uninstall.exe'
+          if (-not (Test-Path $uninstaller)) { throw "No uninstaller was installed" }
+          Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait
+          Start-Sleep -Seconds 3
+          if (Test-Path $exe.FullName) { throw "The app was still present after uninstall" }
+          Write-Host "Uninstalled cleanly"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    needs: windows
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+          path: dist
+      - name: Check the tag matches the app version
+        run: |
+          version=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          if [ "v$version" != "$TAG" ]; then
+            echo "Tag $TAG does not match the app version v$version (apps/desktop/src-tauri/tauri.conf.json)." >&2
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - name: Write release notes
+        run: |
+          installer=$(ls dist/*-setup.exe | head -n 1)
+          sha=$(cut -d' ' -f1 "$installer.sha256")
+          sed -e "s/@VERSION@/$VERSION/g" -e "s/@SHA256@/$sha/g" -e "s/@FILE@/$(basename "$installer")/g" \
+            docs/release-notes-windows.md > notes.md
+      - name: Create or update the draft pre-release
+        run: |
+          files=$(ls dist/*-setup.exe dist/*.sha256)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" $files --clobber
+            gh release edit "$TAG" --notes-file notes.md
+          else
+            gh release create "$TAG" $files --draft --prerelease \
+              --title "Care Navigator $VERSION (Windows preview)" --notes-file notes.md
+          fi

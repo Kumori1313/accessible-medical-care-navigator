@@ -35,3 +35,7 @@ eval/forms/degraded/
 # Downloaded forms are not committed; see eval/forms/MANIFEST.md to recreate them
 eval/forms/pdf/
 eval/forms/jpg/
+
+# Build-mode settings (no secrets) are committed
+!apps/web/.env.desktop
+!apps/web/.env.mobile

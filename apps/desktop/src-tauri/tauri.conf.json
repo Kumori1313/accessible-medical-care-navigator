@@ -1,13 +1,13 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Accessible Medical Care Navigator",
+  "productName": "Care Navigator",
   "version": "0.1.0",
   "identifier": "io.github.kumori1313.amcn",
   "build": {
     "frontendDist": "../../web/dist-desktop",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "pnpm --filter @amcn/web dev",
-    "beforeBuildCommand": "VITE_API_BASE_URL=http://localhost:8000 pnpm --filter @amcn/web build:desktop"
+    "beforeBuildCommand": "pnpm --filter @amcn/web build:desktop"
   },
   "app": {
     "windows": [
@@ -36,6 +36,21 @@
       "icons/icon.ico"
     ],
     "category": "Medical",
-    "shortDescription": "Understand medical forms and paperwork in plain language."
+    "shortDescription": "Understand medical forms and paperwork in plain language.",
+    "publisher": "Kumori1313",
+    "copyright": "MIT License",
+    "longDescription": "Photograph a medical form, bill or letter and get a plain-language explanation beside the original, read aloud if you like, with accessibility settings for low vision, dyslexia, motion sensitivity and one-handed use. Not medical advice.",
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": [
+          "English"
+        ],
+        "displayLanguageSelector": false
+      }
+    }
   }
 }
