@@ -1,0 +1,28 @@
+:root {
+  --amcn-fg: #1a1a1a;
+  --amcn-bg: #ffffff;
+  --amcn-accent: #0b4f9c; /* 8.6:1 on white */
+  --amcn-accent-fg: #ffffff;
+  --amcn-focus: #b35c00;
+  --amcn-font-scale: 1;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --amcn-fg: #f2f2f2;
+    --amcn-bg: #121212;
+    --amcn-accent: #9ccaff;
+    --amcn-accent-fg: #0a0a0a;
+    --amcn-focus: #ffb454;
+  }
+}
+html { font-size: calc(100% * var(--amcn-font-scale)); }
+body { color: var(--amcn-fg); background: var(--amcn-bg); font-family: system-ui, sans-serif; line-height: 1.5; }
+.amcn-button {
+  min-height: 44px; min-width: 44px; padding: 0.5rem 1rem; font: inherit;
+  color: var(--amcn-accent-fg); background: var(--amcn-accent);
+  border: 2px solid transparent; border-radius: 6px; cursor: pointer;
+}
+.amcn-button[data-focus-visible] { outline: 3px solid var(--amcn-focus); outline-offset: 2px; }
+.amcn-skip-link { position: absolute; left: -9999px; }
+.amcn-skip-link:focus { left: 0.5rem; top: 0.5rem; padding: 0.5rem 1rem; background: var(--amcn-bg); color: var(--amcn-fg); outline: 3px solid var(--amcn-focus); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
