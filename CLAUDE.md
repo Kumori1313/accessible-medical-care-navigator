@@ -8,6 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Set up so far: pnpm/Turborepo workspace with `apps/web` (React + Vite), `packages/ui` (React Aria Components + CSS tokens), `packages/core` (framework-free logic, e.g. access preferences), CI (`.github/workflows/ci.yml`), and the Python API in `services/api`. `apps/desktop` (Tauri) and `apps/mobile` (Capacitor) are placeholder READMEs only.
 
+## Web flow (`apps/web`)
+
+`App.tsx` is a three-step flow (choose → review/edit text → explanation beside the original) that calls the API through `createApi` in `@amcn/core` (`packages/core/src/api.ts`, injectable for tests). The dev server proxies `/api` to `localhost:8000`. Accessibility conventions to keep: focus moves to the new step's heading on step changes (not on first render, so the skip link stays the first tab stop); progress goes through a persistent `StatusMessage` live region and errors through `role="alert"`; OCR confidence is shown in words, never color alone. Playwright specs in `apps/web/e2e` mock `/api/*` and run axe over each step in light and dark.
+
 ## API pipeline (`services/api/src/amcn_api`)
 
 Deliberately split into steps so the client can show each result to the user before the next one runs: `POST /ocr` (Tesseract, returns text + confidence) → `POST /redact` (regex identifier removal; best-effort, names are not caught) → `POST /explain` (LLM, returns structured JSON). `/explain` only sees text the client submits. Model access goes through the `LLMProvider` protocol in `providers.py` (Anthropic via `AMCN_ANTHROPIC_API_KEY`, optional `AMCN_MODEL`); tests inject a fake via FastAPI `dependency_overrides[get_provider]`. `explain.py` treats document text as untrusted, validates the model's JSON, and drops any `quote` that isn't verbatim in the source. OCR needs the `tesseract` binary installed on the system.

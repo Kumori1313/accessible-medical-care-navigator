@@ -14,7 +14,12 @@ export const defaultPreferences: AccessPreferences = {
   reducedMotion: false,
 };
 
-export function normalizePreferences(input: Partial<AccessPreferences>): AccessPreferences {
+export function normalizePreferences(
+  input: Partial<AccessPreferences>,
+): AccessPreferences {
   const merged = { ...defaultPreferences, ...input };
-  return { ...merged, fontScale: Math.min(3, Math.max(0.75, merged.fontScale)) };
+  return {
+    ...merged,
+    fontScale: Math.min(3, Math.max(0.75, merged.fontScale)),
+  };
 }
