@@ -28,6 +28,8 @@ Testing note: vitest runs without globals, so each package's `vitest.setup.ts` r
 
 Deliberately split into steps so the client can show each result to the user before the next one runs: `POST /ocr` (Tesseract, returns text + confidence) → `POST /redact` (regex identifier removal; best-effort, names are not caught) → `POST /explain` (LLM, returns structured JSON). `/explain` only sees text the client submits. Model access goes through the `LLMProvider` protocol in `providers.py` (Anthropic via `AMCN_ANTHROPIC_API_KEY`, optional `AMCN_MODEL`); tests inject a fake via FastAPI `dependency_overrides[get_provider]`. `explain.py` treats document text as untrusted, validates the model's JSON, and drops any `quote` that isn't verbatim in the source. OCR needs the `tesseract` binary installed on the system.
 
+Accuracy evaluation (`services/api/src/amcn_api/evalharness/`, docs in `docs/accuracy-evaluation.md`): `python -m amcn_api.evalharness {run,degrade,scaffold}` scores OCR and `/explain` output against hand-written TOML answer keys in `eval/answers/` using forms in `eval/forms/` (`eval/forms/MANIFEST.md` records sources; two state-government forms are git-ignored). It calls the same `run_ocr` and `explain_document` as the API, so a pipeline change is measured by re-running it. Scoring functions in `metrics.py` are pure and unit-tested; keep them that way. Never mark an answer key `reviewed = true` without checking it against the form, and never widen keywords just to raise a score.
+
 ## Commands
 
 Python API (`services/api`, uv-managed, Python >=3.12):
@@ -35,6 +37,7 @@ Python API (`services/api`, uv-managed, Python >=3.12):
 - `uv run uvicorn amcn_api.main:app --reload` — dev server
 - `uv run ruff check .` / `uv run mypy` / `uv run pytest` — lint / strict type-check / tests
 - `uv run pytest tests/test_health.py::test_health` — single test
+- From the repo root: `uv run --project services/api python -m amcn_api.evalharness run --ocr-only` — score OCR on the sample forms (no API key needed)
 
 JS workspace (root, pnpm 12, Node >=22): `pnpm lint|typecheck|test|build` run via Turborepo across packages; `pnpm test:a11y` runs the axe-core Playwright check in `apps/web` (needs `pnpm --filter @amcn/web exec playwright install chromium` once).
 - Single JS test: `pnpm --filter @amcn/core exec vitest run src/preferences.test.ts` (or `-t "name"`).

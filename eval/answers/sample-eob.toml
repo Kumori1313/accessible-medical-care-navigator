@@ -1,0 +1,43 @@
+# DRAFT key for the CMS "Reading your Explanation of Benefits" sample.
+# Written from the rendered page; a person must check it against the form before relying on it.
+id = "sample-eob"
+reviewed = false
+document_type = ["explanation of benefits", "eob"]
+
+ocr_must_contain = [
+  "THIS IS NOT A BILL",
+  "Customer Service Number",
+  "Provider Charges",
+  "Allowed Charges",
+  "Paid by Insurer",
+  "What You Owe",
+  "Remark Code",
+]
+
+[[sections]]
+title = "What you owe"
+keywords = ["what you owe", "you owe", "patient balance", "amount you owe"]
+
+[[sections]]
+title = "Provider charges"
+keywords = ["provider charges", "provider bills", "amount the provider"]
+
+[[sections]]
+title = "Allowed charges"
+keywords = ["allowed charges", "allowed amount"]
+
+[[sections]]
+title = "Paid by insurer"
+keywords = ["paid by insurer", "plan will pay", "insurer pays", "health plan pays"]
+
+[[sections]]
+title = "Remark code"
+keywords = ["remark code"]
+
+[[traps]]
+name = "An EOB is not a bill"
+keywords = ["not a bill", "isn't a bill", "is not a bill"]
+
+[[traps]]
+name = "You can appeal a decision you disagree with"
+keywords = ["appeal"]

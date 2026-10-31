@@ -23,3 +23,15 @@ android/app/src/main/assets/public/
 android/app/src/main/assets/capacitor.config.json
 android/app/src/main/assets/capacitor.plugins.json
 android/app/src/main/res/xml/config.xml
+
+# State forms: reuse terms not yet checked
+eval/forms/pdf/prior-auth-texas-nofr001.pdf
+eval/forms/pdf/advance-directive-california.pdf
+eval/forms/jpg/prior-auth-texas-nofr001-*.jpg
+eval/forms/jpg/advance-directive-california-*.jpg
+eval/results/
+eval/forms/degraded/
+
+# Downloaded forms are not committed; see eval/forms/MANIFEST.md to recreate them
+eval/forms/pdf/
+eval/forms/jpg/
