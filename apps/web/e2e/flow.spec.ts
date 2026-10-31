@@ -1,11 +1,5 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
-
-const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
-const expectNoViolations = async (page: Page) => {
-  const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
-  expect(results.violations).toEqual([]);
-};
+import { expect, test } from "@playwright/test";
+import { expectNoViolations, seedPreferences } from "./helpers";
 
 for (const scheme of ["light", "dark"] as const) {
   test(`upload → review → explanation has no axe violations (${scheme})`, async ({
@@ -39,6 +33,7 @@ for (const scheme of ["light", "dark"] as const) {
       }),
     );
 
+    await seedPreferences(page);
     await page.goto("/");
     await expectNoViolations(page);
 
@@ -67,11 +62,15 @@ for (const scheme of ["light", "dark"] as const) {
 }
 
 test("is fully operable by keyboard from the start", async ({ page }) => {
+  await seedPreferences(page);
   await page.goto("/");
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("link", { name: "Skip to main content" }),
   ).toBeFocused();
+  // Settings sits in the header before the content; the skip link lets users bypass it.
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Settings" })).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("button", { name: "Take a photo" }),

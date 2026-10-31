@@ -1,10 +1,13 @@
 import {
+  type AccessPreferences,
   type Api,
   ApiError,
   type Explanation,
   type OcrResult,
   type ReadingLevel,
+  applyPreferences,
   createApi,
+  createPreferencesStore,
   explanationToSpeech,
 } from "@amcn/core";
 import {
@@ -18,20 +21,51 @@ import {
 } from "@amcn/ui";
 import { useEffect, useRef, useState } from "react";
 import { HighlightedText } from "./HighlightedText";
+import { Onboarding } from "./Onboarding";
 import { ReadAloud } from "./ReadAloud";
+import { Settings } from "./Settings";
 
 type Step = "choose" | "review" | "explained";
 
 const defaultApi = createApi();
 
-export function App({ api = defaultApi }: { api?: Api }) {
+type PreferencesStore = ReturnType<typeof createPreferencesStore>;
+
+/** Reading localStorage can throw (blocked cookies, private windows); fall back to no persistence. */
+function browserStore(): PreferencesStore {
+  try {
+    return createPreferencesStore(window.localStorage);
+  } catch {
+    return createPreferencesStore({
+      getItem: () => null,
+      setItem: () => {
+        throw new Error("storage unavailable");
+      },
+    });
+  }
+}
+
+const defaultStore = browserStore();
+
+export function App({
+  api = defaultApi,
+  store = defaultStore,
+}: {
+  api?: Api;
+  store?: PreferencesStore;
+}) {
+  const [initial] = useState(() => store.load());
+  const [prefs, setPrefs] = useState<AccessPreferences>(initial.preferences);
+  const [view, setView] = useState<"onboarding" | "app" | "settings">(
+    initial.onboarded ? "app" : "onboarding",
+  );
+  const [saved, setSaved] = useState(true);
   const [step, setStep] = useState<Step>("choose");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [ocr, setOcr] = useState<OcrResult | null>(null);
   const [text, setText] = useState("");
-  const [level, setLevel] = useState<ReadingLevel>("standard");
   const [explanation, setExplanation] = useState<Explanation | null>(null);
   const [selected, setSelected] = useState(0);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -45,7 +79,19 @@ export function App({ api = defaultApi }: { api?: Api }) {
       return;
     }
     heading.current?.focus();
-  }, [step]);
+  }, [step, view]);
+
+  // Apply display preferences to the page. The dyslexia font is only downloaded when turned on.
+  useEffect(() => {
+    applyPreferences(prefs, document.documentElement);
+    if (prefs.dyslexiaFont)
+      void import("@fontsource/opendyslexic/latin-400.css");
+  }, [prefs]);
+
+  function updatePrefs(next: AccessPreferences) {
+    setPrefs(next);
+    setSaved(store.save(next));
+  }
 
   async function run<T>(
     working: string,
@@ -94,7 +140,7 @@ export function App({ api = defaultApi }: { api?: Api }) {
 
   async function onExplain() {
     const result = await run("Explaining your document…", () =>
-      api.explain(text, level),
+      api.explain(text, prefs.readingLevel),
     );
     if (!result) return;
     setExplanation(result);
@@ -110,12 +156,34 @@ export function App({ api = defaultApi }: { api?: Api }) {
       <SkipLink />
       <header>
         <p>Accessible Medical Care Navigator</p>
+        {view === "app" && (
+          <Button onPress={() => setView("settings")}>Settings</Button>
+        )}
       </header>
       <main id="main" tabIndex={-1}>
         <StatusMessage>{busy || status ? status : null}</StatusMessage>
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
-        {step === "choose" && (
+        {view === "onboarding" && (
+          <Onboarding
+            onPreview={setPrefs}
+            onDone={(p) => {
+              updatePrefs(p);
+              setView("app");
+            }}
+          />
+        )}
+
+        {view === "settings" && (
+          <Settings
+            value={prefs}
+            onChange={updatePrefs}
+            onDone={() => setView("app")}
+            saved={saved}
+          />
+        )}
+
+        {view === "app" && step === "choose" && (
           <section aria-labelledby="h-choose">
             <h1 id="h-choose" ref={heading} tabIndex={-1}>
               Understand my paperwork
@@ -124,16 +192,16 @@ export function App({ api = defaultApi }: { api?: Api }) {
               Add a photo or picture of a medical form, bill or letter. Nothing
               is sent anywhere until you choose to.
             </p>
-            <p>
+            <div className="amcn-actions">
               <FileButton camera onFile={onFile}>
                 Take a photo
               </FileButton>{" "}
               <FileButton onFile={onFile}>Choose an image</FileButton>
-            </p>
+            </div>
           </section>
         )}
 
-        {step === "review" && ocr && (
+        {view === "app" && step === "review" && ocr && (
           <section aria-labelledby="h-review">
             <h1 id="h-review" ref={heading} tabIndex={-1}>
               Check the text we read
@@ -157,15 +225,20 @@ export function App({ api = defaultApi }: { api?: Api }) {
               <label htmlFor="level">Reading level </label>
               <select
                 id="level"
-                value={level}
-                onChange={(e) => setLevel(e.target.value as ReadingLevel)}
+                value={prefs.readingLevel}
+                onChange={(e) =>
+                  updatePrefs({
+                    ...prefs,
+                    readingLevel: e.target.value as ReadingLevel,
+                  })
+                }
               >
                 <option value="simple">Simple</option>
                 <option value="standard">Standard</option>
                 <option value="detailed">Detailed</option>
               </select>
             </p>
-            <p>
+            <div className="amcn-actions">
               <Button onPress={onRedact} isDisabled={busy || !text.trim()}>
                 Remove personal details
               </Button>{" "}
@@ -175,18 +248,25 @@ export function App({ api = defaultApi }: { api?: Api }) {
               <Button onPress={() => setStep("choose")} isDisabled={busy}>
                 Start over
               </Button>
-            </p>
+            </div>
           </section>
         )}
 
-        {step === "explained" && explanation && (
+        {view === "app" && step === "explained" && explanation && (
           <section aria-labelledby="h-explained">
             <h1 id="h-explained" ref={heading} tabIndex={-1}>
               {explanation.document_type}
             </h1>
             <VerifyBanner />
             <p>{explanation.summary}</p>
-            <ReadAloud chunks={explanationToSpeech(explanation)} />
+            <ReadAloud
+              chunks={explanationToSpeech(explanation)}
+              rate={prefs.speechRate}
+              voiceURI={prefs.voiceURI}
+              onChange={({ rate, voiceURI }) =>
+                updatePrefs({ ...prefs, speechRate: rate, voiceURI })
+              }
+            />
             <div className="amcn-columns">
               <div>
                 <h2>What each part asks</h2>
@@ -232,10 +312,10 @@ export function App({ api = defaultApi }: { api?: Api }) {
                 </div>
               </div>
             </div>
-            <p>
+            <div className="amcn-actions">
               <Button onPress={() => setStep("review")}>Back to text</Button>{" "}
               <Button onPress={() => setStep("choose")}>Start over</Button>
-            </p>
+            </div>
           </section>
         )}
       </main>

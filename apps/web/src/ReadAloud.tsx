@@ -48,16 +48,21 @@ const MESSAGES: Record<ReaderState, string> = {
 /** Read-aloud controls. Never starts by itself; screen reader users keep using their own reader. */
 export function ReadAloud({
   chunks,
+  rate,
+  voiceURI,
+  onChange,
   engine = browserEngine(),
 }: {
   chunks: string[];
+  /** Speed and voice are owned by the saved preferences. */
+  rate: number;
+  voiceURI: string;
+  onChange: (v: { rate: number; voiceURI: string }) => void;
   engine?: { synth: Engine; make: (t: string) => Utterance } | null;
 }) {
   const [state, setState] = useState<ReaderState>("idle");
   const [message, setMessage] = useState("");
-  const [rate, setRate] = useState(1);
   const [voices, setVoices] = useState<VoiceLike[]>([]);
-  const [voiceURI, setVoiceURI] = useState("");
   const reader = useRef<Reader | null>(null);
 
   useEffect(() => {
@@ -110,7 +115,7 @@ export function ReadAloud({
         <select
           id="tts-speed"
           value={rate}
-          onChange={(e) => setRate(Number(e.target.value))}
+          onChange={(e) => onChange({ rate: Number(e.target.value), voiceURI })}
         >
           {SPEEDS.map((s) => (
             <option key={s.value} value={s.value}>
@@ -125,7 +130,7 @@ export function ReadAloud({
             <select
               id="tts-voice"
               value={voiceURI}
-              onChange={(e) => setVoiceURI(e.target.value)}
+              onChange={(e) => onChange({ rate, voiceURI: e.target.value })}
             >
               <option value="">Default</option>
               {voices.map((v) => (

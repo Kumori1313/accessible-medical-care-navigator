@@ -1,4 +1,6 @@
-:root {
+/* Light is the default. "system" follows the OS; an explicit data-theme always wins. */
+:root,
+:root[data-theme="light"] {
   --amcn-fg: #1a1a1a;
   --amcn-bg: #ffffff;
   --amcn-accent: #0b4f9c; /* 8.6:1 on white */
@@ -7,7 +9,7 @@
   --amcn-font-scale: 1;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --amcn-fg: #f2f2f2;
     --amcn-bg: #121212;
     --amcn-accent: #9ccaff;
@@ -15,8 +17,35 @@
     --amcn-focus: #ffb454;
   }
 }
+:root[data-theme="dark"] {
+  --amcn-fg: #f2f2f2;
+  --amcn-bg: #121212;
+  --amcn-accent: #9ccaff;
+  --amcn-accent-fg: #0a0a0a;
+  --amcn-focus: #ffb454;
+}
+:root[data-theme="high-contrast"] {
+  --amcn-fg: #ffffff;
+  --amcn-bg: #000000;
+  --amcn-accent: #ffff00;
+  --amcn-accent-fg: #000000;
+  --amcn-focus: #00ffff;
+}
 html {
   font-size: calc(100% * var(--amcn-font-scale));
+}
+:root[data-font="dyslexia"] body {
+  font-family: "OpenDyslexic", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+:root[data-spacing="relaxed"] body {
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  word-spacing: 0.08em;
+}
+:root[data-spacing="wide"] body {
+  line-height: 2;
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
 }
 body {
   color: var(--amcn-fg);
@@ -101,4 +130,64 @@ main {
   max-width: 70rem;
   margin: 0 auto;
   padding: 1rem;
+}
+
+/* One-handed layout: primary actions stick to the bottom (thumb reach) with larger targets. */
+:root[data-one-handed] .amcn-button {
+  min-height: 56px;
+  min-width: 56px;
+}
+:root[data-one-handed] .amcn-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--amcn-bg);
+  padding: 0.75rem 0;
+  border-top: 1px solid currentColor;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.amcn-fieldset {
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+}
+.amcn-fieldset label {
+  display: block;
+  padding: 0.4rem 0;
+}
+.amcn-fieldset input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+select {
+  font: inherit;
+  min-height: 44px;
+  color: inherit;
+  background: var(--amcn-bg);
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+}
+/* Large text must never force sideways scrolling (WCAG 1.4.10 Reflow). */
+body {
+  overflow-wrap: break-word;
+}
+h1,
+h2,
+h3,
+button,
+label {
+  overflow-wrap: anywhere;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 1rem;
 }
