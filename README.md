@@ -1,1 +1,1 @@
-# hackgwinnett-2026
+# Placeholder
