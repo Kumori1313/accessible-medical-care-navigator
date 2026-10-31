@@ -1,4 +1,4 @@
-import type { Explanation } from "./api";
+import type { Answer, Explanation } from "./api";
 
 /** Spoken before every explanation so the audio carries the same caution as the screen. */
 export const SPOKEN_DISCLAIMER =
@@ -141,4 +141,9 @@ export function createReader(
       set("idle");
     },
   };
+}
+
+/** An answer to a spoken question, in chunks short enough for every speech engine. */
+export function answerToSpeech(a: Answer): string[] {
+  return chunkText(a.answer);
 }

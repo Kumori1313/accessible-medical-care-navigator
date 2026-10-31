@@ -25,6 +25,14 @@ export interface Explanation {
   uncertain: string[];
 }
 
+export interface Answer {
+  answer: string;
+  /** False when the document does not answer the question (or the answer could not be confirmed). */
+  found: boolean;
+  /** Verbatim excerpt of the source that supports the answer, or "". */
+  quote: string;
+}
+
 export type ReadingLevel = "simple" | "standard" | "detailed";
 
 export class ApiError extends Error {
@@ -83,6 +91,9 @@ export function createApi(
         "/explain",
         json({ text, reading_level: readingLevel }),
       );
+    },
+    ask(text: string, question: string) {
+      return request<Answer>("/ask", json({ text, question }));
     },
   };
 }

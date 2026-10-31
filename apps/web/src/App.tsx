@@ -24,7 +24,8 @@ import {
 } from "@amcn/ui";
 import { useEffect, useRef, useState } from "react";
 import { HighlightedText } from "./HighlightedText";
-import { type DemoSample, DEMO_SAMPLES } from "./demo/samples";
+import { AskPanel } from "./AskPanel";
+import { type DemoSample, DEMO_SAMPLES, matchCanned } from "./demo/samples";
 import { createIdbStorage, indexedDbAvailable } from "./idbStorage";
 import { Onboarding } from "./Onboarding";
 import { PwaNotices } from "./PwaNotices";
@@ -88,6 +89,8 @@ export function App({
   // A built-in sample document is open: its text and explanation are bundled, so no server is needed.
   const [sample, setSample] = useState<DemoSample | null>(null);
   const [sampleExplained, setSampleExplained] = useState(false);
+  // Passage of the original that supports the latest answer to a question (highlighted like a section).
+  const [answerQuote, setAnswerQuote] = useState("");
   const [step, setStep] = useState<Step>("choose");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
@@ -183,6 +186,7 @@ export function App({
     setExplanation(doc.explanation);
     setSelected(0);
     setFromSaved(true);
+    setAnswerQuote("");
     setSavedNotice("");
     setStep("explained");
     setView("app");
@@ -222,6 +226,7 @@ export function App({
   function startSample(s: DemoSample) {
     setSample(s);
     setSampleExplained(false);
+    setAnswerQuote("");
     setError("");
     setOcr(s.ocr);
     setText(s.ocr.text);
@@ -232,6 +237,7 @@ export function App({
   function startOver() {
     setSample(null);
     setSampleExplained(false);
+    setAnswerQuote("");
     setFromSaved(false);
     setSavedNotice("");
     setStep("choose");
@@ -255,6 +261,7 @@ export function App({
     // Untouched sample text gets its bundled explanation, with no network call.
     if (sample && text === sample.ocr.text) {
       setExplanation(sample.explanation);
+      setAnswerQuote("");
       setSampleExplained(true);
       setSelected(0);
       setError("");
@@ -263,6 +270,7 @@ export function App({
       return;
     }
     setSampleExplained(false);
+    setAnswerQuote("");
     const result = await run("Explaining your document…", () =>
       api.explain(text, prefs.readingLevel),
     );
@@ -433,6 +441,21 @@ export function App({
                 updatePrefs({ ...prefs, speechRate: rate, voiceURI })
               }
             />
+            <AskPanel
+              text={text}
+              api={api}
+              canned={
+                sample && text === sample.ocr.text
+                  ? {
+                      questions: sample.questions,
+                      lookup: (q) => matchCanned(sample, q),
+                    }
+                  : null
+              }
+              speechRate={prefs.speechRate}
+              voiceURI={prefs.voiceURI}
+              onAnswer={setAnswerQuote}
+            />
             <div className="amcn-columns">
               <div>
                 <h2>What each part asks</h2>
@@ -440,7 +463,10 @@ export function App({
                   {explanation.sections.map((s, i) => (
                     <li key={i}>
                       <Button
-                        onPress={() => setSelected(i)}
+                        onPress={() => {
+                          setSelected(i);
+                          setAnswerQuote("");
+                        }}
                         aria-pressed={i === selected}
                       >
                         {s.title}
@@ -474,7 +500,10 @@ export function App({
                   role="region"
                   aria-label="Original document text"
                 >
-                  <HighlightedText text={text} quote={current?.quote ?? ""} />
+                  <HighlightedText
+                    text={text}
+                    quote={answerQuote || (current?.quote ?? "")}
+                  />
                 </div>
               </div>
             </div>

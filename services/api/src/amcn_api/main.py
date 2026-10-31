@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from .ask import Answer, AskError, ask_document
 from .explain import Explanation, ExplanationError, ReadingLevel, explain_document
 from .ocr import UnreadableImageError, run_ocr
 from .providers import LLMProvider, ProviderNotConfiguredError, provider_from_env
@@ -101,4 +102,18 @@ def explain(
     try:
         return explain_document(provider, body.text, body.reading_level)
     except ExplanationError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+class AskRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=100_000)
+    question: str = Field(min_length=1, max_length=500)
+
+
+@app.post("/ask")
+def ask(body: AskRequest, provider: Annotated[LLMProvider, Depends(get_provider)]) -> Answer:
+    """Answer a question using only the document text the client submits."""
+    try:
+        return ask_document(provider, body.text, body.question)
+    except AskError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

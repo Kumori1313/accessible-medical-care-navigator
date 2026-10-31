@@ -1,4 +1,4 @@
-import type { Explanation, OcrResult } from "@amcn/core";
+import type { Answer, Explanation, OcrResult } from "@amcn/core";
 import {
   AUTHORIZATION_CONFIDENCE,
   AUTHORIZATION_TEXT,
@@ -13,6 +13,15 @@ import {
  * The OCR text is real pipeline output. The explanations are PRE-WRITTEN (not live model output)
  * and the UI says so. Every `quote` must appear word for word in the OCR text; a test enforces it.
  */
+/** A pre-written question and answer, so "ask a question" works with no server. */
+export interface CannedQuestion {
+  /** Shown as a suggestion the user can pick. */
+  question: string;
+  /** The question matches if ALL words in ANY one group appear in it (case-insensitive). */
+  match: string[][];
+  answer: Answer;
+}
+
 export interface DemoSample {
   id: string;
   title: string;
@@ -21,6 +30,7 @@ export interface DemoSample {
   source: string;
   ocr: OcrResult;
   explanation: Explanation;
+  questions: CannedQuestion[];
 }
 
 const ocr = (text: string, confidence: number): OcrResult => ({
@@ -105,6 +115,49 @@ export const DEMO_SAMPLES: DemoSample[] = [
         "The table in the photo was hard to read, so some numbers may be wrong. Check the totals against your paper copy.",
       ],
     },
+    questions: [
+      {
+        question: "Is this a bill?",
+        match: [["bill"]],
+        answer: {
+          answer:
+            "No. The document says an EOB is not a bill. You may get a separate bill from your provider.",
+          found: true,
+          quote: "An EOB is NOT A BILL",
+        },
+      },
+      {
+        question: "How much do I owe?",
+        match: [["owe"], ["balance"], ["how", "much", "pay"]],
+        answer: {
+          answer:
+            "In this example, the amount you owe is $35.00. That is what is left after your plan has paid its share.",
+          found: true,
+          quote: "7.What You Owe is the amount you owe after",
+        },
+      },
+      {
+        question: "Who do I call with questions?",
+        match: [["call"], ["phone"], ["number"], ["contact"]],
+        answer: {
+          answer:
+            "The customer service number in this example is 1-800-123-4567. You can call it with questions about your coverage.",
+          found: true,
+          quote: "Customer Service Number: 1-800-123-4567",
+        },
+      },
+      {
+        question: "Can I appeal?",
+        match: [["appeal"], ["disagree"], ["dispute"]],
+        answer: {
+          answer:
+            "Yes, you may be able to appeal. If you disagree with a coverage or payment decision, keep the bill and call your health plan right away.",
+          found: true,
+          quote:
+            "If you disagree with a coverage or payment decision by your health",
+        },
+      },
+    ],
   },
   {
     id: "authorization",
@@ -154,6 +207,44 @@ export const DEMO_SAMPLES: DemoSample[] = [
         "The text in the boxes for your name and number is blank in this sample.",
       ],
     },
+    questions: [
+      {
+        question: "Who can see my information?",
+        match: [["who"], ["share"], ["see"]],
+        answer: {
+          answer:
+            "Only the people or organizations you list on the form. There is room for two names, and you can list more on the back of the form.",
+          found: true,
+          quote:
+            "To share with more than 2 people or organizations, list their name and address on the back of this form.",
+        },
+      },
+      {
+        question: "Can I choose what is shared?",
+        match: [
+          ["choose"],
+          ["limit"],
+          ["what", "shared"],
+          ["which", "information"],
+        ],
+        answer: {
+          answer:
+            "Yes. You choose one box: any information, or limited information. If you choose limited, you tick the types you want to share.",
+          found: true,
+          quote: "Check only one box:",
+        },
+      },
+      {
+        question: "Can I cancel it later?",
+        match: [["cancel"], ["revoke"], ["change", "mind"], ["take", "back"]],
+        answer: {
+          answer:
+            "This page does not say. The rules for cancelling may be on another page of the form, so ask 1-800-MEDICARE.",
+          found: false,
+          quote: "",
+        },
+      },
+    ],
   },
   {
     id: "vaccine",
@@ -204,8 +295,76 @@ export const DEMO_SAMPLES: DemoSample[] = [
       ],
       uncertain: [],
     },
+    questions: [
+      {
+        question: "Who should get the flu shot?",
+        match: [["who"], ["should"]],
+        answer: {
+          answer:
+            "The CDC recommends that everyone 6 months and older get vaccinated every flu season.",
+          found: true,
+          quote: "CDC recommends everyone 6 months and older",
+        },
+      },
+      {
+        question: "Does the shot give you the flu?",
+        match: [["give", "flu"], ["cause"], ["catch", "flu"]],
+        answer: {
+          answer: "No. The handout says the flu vaccine does not cause flu.",
+          found: true,
+          quote: "Influenza vaccine does not cause flu.",
+        },
+      },
+      {
+        question: "How long until it works?",
+        match: [["how", "long"], ["work"], ["protect"]],
+        answer: {
+          answer:
+            "It takes about 2 weeks for protection to develop after the shot.",
+          found: true,
+          quote: "It takes about 2 weeks for protection to develop",
+        },
+      },
+      {
+        question: "How many doses do I need?",
+        match: [["dose"], ["how", "many"]],
+        answer: {
+          answer:
+            "Children 6 months through 8 years may need 2 doses in one flu season. Everyone else needs 1 dose each flu season.",
+          found: true,
+          quote: "Children 6 months",
+        },
+      },
+    ],
   },
 ];
+
+const words = (text: string) => text.toLowerCase().match(/[a-z0-9$-]+/g) ?? [];
+
+/**
+ * Finds a pre-written answer for a question asked in the user's own words, or undefined.
+ * Words match as prefixes, so "owe" also catches "owed" and "paying" matches "pay". When several
+ * questions fit, the most specific one (the group that matched the most words) wins.
+ */
+export function matchCanned(
+  sample: DemoSample,
+  question: string,
+): CannedQuestion | undefined {
+  const asked = words(question);
+  const has = (w: string) =>
+    asked.some((a) => a.startsWith(w) || (w.startsWith(a) && a.length >= 3));
+  let best: CannedQuestion | undefined;
+  let bestScore = 0;
+  for (const q of sample.questions) {
+    for (const group of q.match) {
+      if (group.length > bestScore && group.every(has)) {
+        best = q;
+        bestScore = group.length;
+      }
+    }
+  }
+  return best;
+}
 
 export function findSample(id: string): DemoSample | undefined {
   return DEMO_SAMPLES.find((s) => s.id === id);
