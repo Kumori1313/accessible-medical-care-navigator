@@ -22,6 +22,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { HighlightedText } from "./HighlightedText";
 import { Onboarding } from "./Onboarding";
+import { PwaNotices } from "./PwaNotices";
+import { usePwa } from "./pwa";
 import { ReadAloud } from "./ReadAloud";
 import { Settings } from "./Settings";
 
@@ -60,6 +62,7 @@ export function App({
     initial.onboarded ? "app" : "onboarding",
   );
   const [saved, setSaved] = useState(true);
+  const pwa = usePwa();
   const [step, setStep] = useState<Step>("choose");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
@@ -163,6 +166,7 @@ export function App({
       <main id="main" tabIndex={-1}>
         <StatusMessage>{busy || status ? status : null}</StatusMessage>
         {error && <ErrorMessage>{error}</ErrorMessage>}
+        <PwaNotices {...pwa} />
 
         {view === "onboarding" && (
           <Onboarding
