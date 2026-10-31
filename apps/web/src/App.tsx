@@ -5,6 +5,7 @@ import {
   type OcrResult,
   type ReadingLevel,
   createApi,
+  explanationToSpeech,
 } from "@amcn/core";
 import {
   Button,
@@ -17,6 +18,7 @@ import {
 } from "@amcn/ui";
 import { useEffect, useRef, useState } from "react";
 import { HighlightedText } from "./HighlightedText";
+import { ReadAloud } from "./ReadAloud";
 
 type Step = "choose" | "review" | "explained";
 
@@ -184,6 +186,7 @@ export function App({ api = defaultApi }: { api?: Api }) {
             </h1>
             <VerifyBanner />
             <p>{explanation.summary}</p>
+            <ReadAloud chunks={explanationToSpeech(explanation)} />
             <div className="amcn-columns">
               <div>
                 <h2>What each part asks</h2>
