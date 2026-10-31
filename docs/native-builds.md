@@ -2,7 +2,7 @@
 
 The web app is the single codebase; `apps/desktop` (Tauri) and `apps/mobile` (Capacitor) wrap it. Native shells bundle the app, so they have **no `/api` proxy and no service worker**. Instead:
 
-- The web app is built with `VITE_NATIVE=1` and `VITE_API_BASE_URL=<server address>` baked in (`build:desktop` and `build:mobile` in `apps/web`, each with its own output folder so the two addresses can't mix).
+- The web app is built in a Vite **mode**, `desktop` or `mobile` (`build:desktop` and `build:mobile` in `apps/web`), which loads `apps/web/.env.desktop` or `.env.mobile` (`VITE_NATIVE=1`, plus the server address for desktop). Each mode writes its own output folder so the two addresses can't mix. Modes are used instead of inline `VAR=value` scripts so the same commands work on Windows. A variable set in your shell (e.g. `VITE_API_BASE_URL=...`) overrides the file.
 - The API allows the shells' origins through CORS (`tauri://localhost`, `https://localhost`, `capacitor://localhost`; see `services/api/src/amcn_api/main.py`). Other origins are refused unless set in `AMCN_CORS_ORIGINS`.
 
 The app sends document text to whatever server the build points at. For a local-first setup, run the API on the same machine (desktop) or on a server you control (phone).
@@ -17,7 +17,7 @@ pnpm --filter @amcn/desktop package   # installers (deb/rpm/AppImage on Linux)
 pnpm --filter @amcn/desktop exec tauri build --no-bundle   # just the binary, faster
 ```
 
-The release build points at `http://localhost:8000` (`beforeBuildCommand` in `tauri.conf.json`). To use another server, change it there **and** in `app.security.csp` (`connect-src`), which otherwise blocks the request.
+The release build points at `http://localhost:8000` (`apps/web/.env.desktop`). To use another server, change it there **and** in `app.security.csp` (`connect-src`), which otherwise blocks the request.
 
 ## Android (Capacitor 8)
 
@@ -39,3 +39,19 @@ For a development API over plain HTTP (e.g. an emulator reaching `http://10.0.2.
 - **macOS/Windows desktop builds:** Tauri builds natively per OS; add CI runners for them before releasing.
 - **Code signing, release keystores, store listings.**
 - **Manual assistive-technology pass** on each shell (TalkBack in the Android build; Orca/NVDA/VoiceOver with the desktop build). WebView accessibility differs from the browser. See `docs/a11y-test-matrix.md`.
+
+## Windows installer and GitHub releases
+
+`.github/workflows/release-desktop.yml` builds the Windows installer (NSIS, per-user, no administrator needed) on a
+`windows-latest` runner and **smoke-tests it**: silent install, launch, wait, screenshot, uninstall. The screenshot is
+uploaded with the installer as the `windows-installer` artifact; look at it before publishing.
+
+- A pull request touching the desktop shell builds and tests it but publishes nothing.
+- **To make a release:** make sure `version` in `apps/desktop/src-tauri/tauri.conf.json` (and `Cargo.toml`) is what you
+  want, then push a tag `vX.Y.Z` that matches it, or run the workflow manually with the `tag` input. This creates a
+  **draft pre-release** with the installer, its SHA-256 and the notes from `docs/release-notes-windows.md`.
+- **To publish it:** review the draft on GitHub (Releases), then press Publish, or `gh release edit vX.Y.Z --draft=false`.
+- The installer is **not code-signed**, so Windows SmartScreen warns users ("More info", then "Run anyway"). Signing
+  needs a certificate; free signing for open-source projects (e.g. SignPath Foundation) is worth applying for.
+- The app only works fully with a server. Without one, only the built-in samples work (the release notes say so).
+- Not tested on a real Windows machine by a person, only by the CI smoke test. Linux and macOS installers are not built yet.

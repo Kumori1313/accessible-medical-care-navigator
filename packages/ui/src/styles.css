@@ -132,6 +132,8 @@ main {
   padding: 1rem;
 }
 
+/* Rows of buttons: spaced and wrapping, so they never touch and never force sideways scrolling. */
+.amcn-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
 /* One-handed layout: primary actions stick to the bottom (thumb reach) with larger targets. */
 :root[data-one-handed] .amcn-button {
   min-height: 56px;
