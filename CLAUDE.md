@@ -22,6 +22,8 @@ Encrypted saved documents (`packages/core/src/vault/`, `apps/web/src/{useVault,i
 
 Native shells: they bundle the web app, so there is no `/api` proxy and no service worker. `apps/web` has `build:desktop` and `build:mobile`, which set `VITE_NATIVE=1` and write to separate folders (`dist-desktop`, `dist-mobile`) because each bakes in a different `VITE_API_BASE_URL`; never share one output folder between them. The API's CORS allow-list (`services/api/src/amcn_api/main.py`) must include each shell's origin, and Tauri's CSP `connect-src` in `tauri.conf.json` must include the API address. The shells' scripts are deliberately not named `build`, so `pnpm build` (Turborepo) stays fast; native builds run in `.github/workflows/native.yml`. ESLint ignores the native build output and generated projects.
 
+Demo mode (`apps/web/src/demo/`): three built-in sample documents (real Tesseract output in `sampleText.ts`, pre-written explanations in `samples.ts`) that run with no server, key or network, so the offline fallback and the standalone desktop app have something to show. The explanations are NOT live model output and the UI labels them as such; `samples.test.ts` enforces that every quote is verbatim in the OCR text and every dollar figure is in the source. Editing a sample's text sends it to the real API instead. See `docs/conference-demo-plan.md` for the demo scope, build order and what not to claim.
+
 Testing note: vitest runs without globals, so each package's `vitest.setup.ts` registers Testing Library `cleanup` explicitly; keep that when adding packages.
 
 ## API pipeline (`services/api/src/amcn_api`)
