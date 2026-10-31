@@ -15,14 +15,90 @@
     --amcn-focus: #ffb454;
   }
 }
-html { font-size: calc(100% * var(--amcn-font-scale)); }
-body { color: var(--amcn-fg); background: var(--amcn-bg); font-family: system-ui, sans-serif; line-height: 1.5; }
-.amcn-button {
-  min-height: 44px; min-width: 44px; padding: 0.5rem 1rem; font: inherit;
-  color: var(--amcn-accent-fg); background: var(--amcn-accent);
-  border: 2px solid transparent; border-radius: 6px; cursor: pointer;
+html {
+  font-size: calc(100% * var(--amcn-font-scale));
 }
-.amcn-button[data-focus-visible] { outline: 3px solid var(--amcn-focus); outline-offset: 2px; }
-.amcn-skip-link { position: absolute; left: -9999px; }
-.amcn-skip-link:focus { left: 0.5rem; top: 0.5rem; padding: 0.5rem 1rem; background: var(--amcn-bg); color: var(--amcn-fg); outline: 3px solid var(--amcn-focus); }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+body {
+  color: var(--amcn-fg);
+  background: var(--amcn-bg);
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+.amcn-button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  color: var(--amcn-accent-fg);
+  background: var(--amcn-accent);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.amcn-button[data-focus-visible] {
+  outline: 3px solid var(--amcn-focus);
+  outline-offset: 2px;
+}
+.amcn-skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.amcn-skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--amcn-bg);
+  color: var(--amcn-fg);
+  outline: 3px solid var(--amcn-focus);
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.amcn-banner {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--amcn-focus);
+  border-radius: 6px;
+}
+.amcn-error {
+  padding: 0.75rem 1rem;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.amcn-status:empty {
+  display: none;
+}
+.amcn-columns {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+.amcn-original {
+  white-space: pre-wrap;
+  padding: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+}
+.amcn-original mark {
+  background: var(--amcn-focus);
+  color: var(--amcn-bg);
+  padding: 0 0.15em;
+}
+.amcn-field {
+  display: block;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--amcn-bg);
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+main {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
