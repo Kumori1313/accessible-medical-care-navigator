@@ -18,9 +18,11 @@ cut first if time runs out.
 
 1. **Demo mode** with built-in sample documents that work with no server, key or network. (Done: three public
    US government documents with real OCR output and pre-written explanations, labelled as such in the UI.)
-2. Image cleanup before OCR (deskew, contrast), measured with the evaluation harness. Phone photos under booth
-   lighting are the biggest live risk: OCR found only 43% of key phrases on phone-style photos.
-3. Voice questions about a document.
+2. Image cleanup before OCR. (Done, measured with the evaluation harness: phone-style photos 61% to 69% of key
+   phrases found, dim photos 56% to 73%, clean pages unchanged. See `docs/accuracy-evaluation.md`.)
+3. Voice questions about a document. (Done: typed or spoken questions, answered from the document only, with the
+   source passage highlighted. Chrome-based browsers only for voice; typed questions work everywhere. Samples have
+   pre-written questions so it works offline.)
 4. Desktop release builds (Linux, Windows, macOS), unsigned, published as a draft release.
 5. Screenshot walkthrough. If time is short, ship it with a canned sample only.
 
@@ -51,7 +53,9 @@ translations, no 50-form accuracy study, no agentic booking.
 2. **Explain.** Show the side-by-side view and click "What you owe" to highlight where it came from.
 3. **Read aloud.** Change speed. Mention the spoken disclaimer.
 4. **Settings.** Turn on high contrast, largest text, dyslexia font, one-handed layout. "Set once during onboarding."
-5. (If built) Ask a question by voice. (If built) Screenshot walkthrough.
+5. **Ask a question.** Press "Speak your question" and say "How much do I owe?" (works offline on the samples; the
+   room must be quiet, and Chrome sends the audio to Google, so say so if asked). Then type one to show the fallback.
+   (If built) Screenshot walkthrough.
 6. Close on the human-in-the-loop principle: nothing is sent or booked without the user.
 
 ## Before the day

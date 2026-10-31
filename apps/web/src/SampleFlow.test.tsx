@@ -24,6 +24,11 @@ const forbiddenApi = (): Api => ({
   explain: vi.fn(() =>
     Promise.reject(new Error("explain must not be called for samples")),
   ),
+  ask: vi.fn(() =>
+    Promise.reject(
+      new Error("ask must not be called for matched sample questions"),
+    ),
+  ),
 });
 
 function setup(api = forbiddenApi()) {
@@ -115,4 +120,31 @@ it("if the user edits a sample's text, the real service is used instead of the c
   ).toBeInTheDocument();
   expect(api.explain).toHaveBeenCalledOnce();
   expect(screen.queryByText(/Pre-written sample/)).not.toBeInTheDocument();
+});
+
+it("asking a sample question highlights the supporting passage in the original, offline", async () => {
+  const { api, container } = setup();
+  await userEvent.click(
+    screen.getByRole("button", { name: /Insurance statement/ }),
+  );
+  await userEvent.click(
+    screen.getByRole("button", { name: "Explain this document" }),
+  );
+  await screen.findByRole("heading", { name: /Explanation of Benefits/ });
+
+  await userEvent.click(screen.getByRole("button", { name: "Can I appeal?" }));
+  expect(
+    await screen.findByRole("heading", { name: "Answer" }),
+  ).toBeInTheDocument();
+  expect(container.querySelector("mark")?.textContent).toContain(
+    "If you disagree with a coverage",
+  );
+
+  // Choosing a section takes over the highlight again.
+  await userEvent.click(screen.getByRole("button", { name: "What you owe" }));
+  expect(container.querySelector("mark")?.textContent).toContain(
+    "What You Owe",
+  );
+  expect((await axe(container)).violations).toEqual([]);
+  expect(api.ask).not.toHaveBeenCalled();
 });

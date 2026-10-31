@@ -21,6 +21,7 @@ const api: Api = {
     low_confidence: false,
   }),
   redact: vi.fn(),
+  ask: vi.fn(),
   explain: vi.fn().mockResolvedValue({
     document_type: "Intake form",
     summary: "Collects patient details.",

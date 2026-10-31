@@ -131,3 +131,16 @@ describe("createReader", () => {
     expect(reader.state).toBe("idle");
   });
 });
+
+describe("answerToSpeech", () => {
+  it("chunks the answer text for speaking", async () => {
+    const { answerToSpeech } = await import("./speech");
+    const spoken = answerToSpeech({
+      answer: "You owe $35.00. Call 1-800-123-4567 with questions.",
+      found: true,
+      quote: "",
+    });
+    expect(spoken.join(" ")).toContain("$35.00");
+    expect(spoken.every((c) => c.length <= 220)).toBe(true);
+  });
+});

@@ -14,22 +14,30 @@ export interface VoiceLike {
   lang: string;
 }
 
-interface Engine extends SynthLike {
+export interface Engine extends SynthLike {
   getVoices(): VoiceLike[];
   addEventListener?(type: "voiceschanged", cb: () => void): void;
   removeEventListener?(type: "voiceschanged", cb: () => void): void;
 }
 
-function browserEngine(): {
+export type SpeechEngine = {
   synth: Engine;
   make: (t: string) => Utterance;
-} | null {
+};
+
+export function browserEngine(): SpeechEngine | null {
   if (typeof window === "undefined" || !("speechSynthesis" in window))
     return null;
   return {
     synth: window.speechSynthesis as unknown as Engine,
     make: (t) => new SpeechSynthesisUtterance(t) as unknown as Utterance,
   };
+}
+
+function sameVoices(a: VoiceLike[], b: VoiceLike[]): boolean {
+  return (
+    a.length === b.length && a.every((v, i) => v.voiceURI === b[i]?.voiceURI)
+  );
 }
 
 const SPEEDS = [
@@ -51,7 +59,7 @@ export function ReadAloud({
   rate,
   voiceURI,
   onChange,
-  engine = browserEngine(),
+  engine: engineProp,
 }: {
   chunks: string[];
   /** Speed and voice are owned by the saved preferences. */
@@ -60,6 +68,10 @@ export function ReadAloud({
   onChange: (v: { rate: number; voiceURI: string }) => void;
   engine?: { synth: Engine; make: (t: string) => Utterance } | null;
 }) {
+  // Created once: a new engine object on every render would rebuild the reader (cancelling any
+  // speech in progress) and re-run the effect below forever.
+  const [browserDefault] = useState(browserEngine);
+  const engine = engineProp === undefined ? browserDefault : engineProp;
   const [state, setState] = useState<ReaderState>("idle");
   const [message, setMessage] = useState("");
   const [voices, setVoices] = useState<VoiceLike[]>([]);
@@ -72,7 +84,11 @@ export function ReadAloud({
       setMessage(MESSAGES[s]);
     });
     reader.current = r;
-    const load = () => setVoices(engine.synth.getVoices());
+    const load = () => {
+      const next = engine.synth.getVoices();
+      // getVoices() returns a fresh array each call; only update state when the list really changed.
+      setVoices((prev) => (sameVoices(prev, next) ? prev : next));
+    };
     load();
     engine.synth.addEventListener?.("voiceschanged", load);
     return () => {

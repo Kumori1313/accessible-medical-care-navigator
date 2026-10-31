@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_SAMPLES, findSample } from "./samples";
+import { DEMO_SAMPLES, findSample, matchCanned } from "./samples";
 
 describe("demo samples", () => {
   it("has unique ids and lookups work", () => {
@@ -38,4 +38,48 @@ describe("demo samples", () => {
       });
     });
   }
+});
+
+describe("canned questions", () => {
+  for (const sample of DEMO_SAMPLES) {
+    describe(sample.id, () => {
+      it("has questions whose answers are grounded in the OCR text", () => {
+        expect(sample.questions.length).toBeGreaterThanOrEqual(3);
+        for (const q of sample.questions) {
+          if (q.answer.found)
+            expect(sample.ocr.text, `${q.question}: quote`).toContain(
+              q.answer.quote,
+            );
+          else expect(q.answer.quote).toBe("");
+          for (const amount of q.answer.answer.match(
+            /\$\d[\d,]*(?:\.\d+)?|\d{1,2}-\d{3}-\d{3}-\d{4}/g,
+          ) ?? []) {
+            expect(sample.ocr.text, `${amount} not in source`).toContain(
+              amount,
+            );
+          }
+        }
+      });
+
+      it("matches each suggested question to its own answer", () => {
+        for (const q of sample.questions)
+          expect(matchCanned(sample, q.question)).toBe(q);
+      });
+    });
+  }
+
+  it("understands natural variations and rejects unrelated questions", () => {
+    const eob = findSample("eob")!;
+    expect(matchCanned(eob, "so how much am I paying?")?.question).toBe(
+      "How much do I owe?",
+    );
+    expect(matchCanned(eob, "what is the phone number")?.question).toBe(
+      "Who do I call with questions?",
+    );
+    expect(matchCanned(eob, "is this a bill or what")?.question).toBe(
+      "Is this a bill?",
+    );
+    expect(matchCanned(eob, "what is the weather tomorrow")).toBeUndefined();
+    expect(matchCanned(eob, "")).toBeUndefined();
+  });
 });

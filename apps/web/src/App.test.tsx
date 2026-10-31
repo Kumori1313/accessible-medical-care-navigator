@@ -32,6 +32,7 @@ const fakeApi = (over: Partial<Api> = {}): Api => ({
     ],
     uncertain: [],
   }),
+  ask: vi.fn().mockResolvedValue({ answer: "ok", found: true, quote: "" }),
   ...over,
 });
 

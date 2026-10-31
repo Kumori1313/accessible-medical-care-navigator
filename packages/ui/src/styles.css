@@ -202,3 +202,4 @@ header {
   user-select: all;
 }
 .amcn-samples { list-style: none; padding: 0; } .amcn-samples li { margin: 0 0 1rem; }
+.amcn-answer { border-left: 4px solid var(--amcn-accent); padding: 0.25rem 1rem; margin: 1rem 0; }

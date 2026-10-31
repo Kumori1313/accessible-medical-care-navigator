@@ -3,3 +3,4 @@ export * from "./api";
 export * from "./speech";
 export * from "./vault/crypto";
 export * from "./vault/vault";
+export * from "./listen";
