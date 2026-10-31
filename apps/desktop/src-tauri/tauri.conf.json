@@ -1,0 +1,41 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Accessible Medical Care Navigator",
+  "version": "0.1.0",
+  "identifier": "io.github.kumori1313.amcn",
+  "build": {
+    "frontendDist": "../../web/dist-desktop",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm --filter @amcn/web dev",
+    "beforeBuildCommand": "VITE_API_BASE_URL=http://localhost:8000 pnpm --filter @amcn/web build:desktop"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Accessible Medical Care Navigator",
+        "width": 1100,
+        "height": 800,
+        "minWidth": 320,
+        "minHeight": 480,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost http://localhost:8000; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Medical",
+    "shortDescription": "Understand medical forms and paperwork in plain language."
+  }
+}

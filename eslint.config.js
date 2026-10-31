@@ -5,7 +5,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["**/dist/**", "**/node_modules/**", "services/**", "**/test-results/**"] },
+  { ignores: ["**/dist/**", "**/dist-*/**", "**/node_modules/**", "services/**", "**/test-results/**", "apps/desktop/src-tauri/**", "apps/mobile/android/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   jsxA11y.flatConfigs.strict,

@@ -34,7 +34,13 @@ export function usePwa(): PwaState {
   const update = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
-    if (!import.meta.env.PROD || !("serviceWorker" in navigator)) return;
+    // Native shells bundle the app, so there is nothing to cache or update through a service worker.
+    if (
+      !import.meta.env.PROD ||
+      import.meta.env.VITE_NATIVE ||
+      !("serviceWorker" in navigator)
+    )
+      return;
     const updateSW = registerSW({
       onNeedRefresh: () => setUpdateReady(true),
       onOfflineReady: () => setOfflineReady(true),

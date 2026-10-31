@@ -2,10 +2,13 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+const native = !!process.env.VITE_NATIVE;
+
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      disable: native,
       // "prompt": a new version waits until the user chooses to update, so a reload never
       // wipes a document someone is in the middle of reading or editing.
       registerType: "prompt",
