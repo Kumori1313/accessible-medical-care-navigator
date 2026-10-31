@@ -1,0 +1,69 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "marketplace-application"
+reviewed = false
+document_type = ["application for health coverage", "marketplace application", "health coverage application", "health insurance application"]
+notes = "The 14-page paper Marketplace application (OMB 0938-1191, expires 09/30/2027), with steps 1-5 and appendices A-D."
+
+ocr_must_contain = [
+  "Application for Health Coverage",
+  "Tell us about yourself",
+  "Tell us about your household",
+  "Your household's health coverage",
+  "Your agreement & signature",
+  "1-800-318-2596",
+]
+
+[[sections]]
+title = "Who can use this application and what you may need"
+keywords = ["who can use", "what you may need", "social security", "apply for anyone", "documents"]
+
+[[sections]]
+title = "Step 1: about yourself"
+keywords = ["step 1", "about yourself", "tell us about yourself"]
+required = true
+
+[[sections]]
+title = "Step 2: about your household"
+keywords = ["step 2", "household", "tell us about your household"]
+required = true
+
+[[sections]]
+title = "Income and employer information"
+keywords = ["income", "employer", "job", "wages", "step 3"]
+
+[[sections]]
+title = "Step 4: household health coverage"
+keywords = ["step 4", "health coverage", "current coverage", "other coverage"]
+
+[[sections]]
+title = "Step 5: agreement and signature"
+keywords = ["step 5", "agreement", "signature", "sign"]
+required = true
+
+[[sections]]
+title = "Appeal rights"
+keywords = ["appeal"]
+
+[[sections]]
+title = "Appendices (job-based coverage, help with the form, life changes)"
+keywords = ["appendix", "health coverage from jobs", "life changes", "someone is helping"]
+
+[[traps]]
+name = "Tell the Marketplace within 30 days of any change to what you wrote"
+keywords = ["30 days"]
+
+[[traps]]
+name = "Open Enrollment runs November 1 to January 15; otherwise a qualifying life event is needed"
+keywords = ["january 15", "open enrollment", "life event", "november 1"]
+
+[[traps]]
+name = "Free help, an accessible format, and language help are available by phone"
+keywords = ["1-800-318-2596", "large print", "braille", "language", "tty", "free help", "no cost"]
+
+[[traps]]
+name = "You can appeal eligibility results and may keep coverage while the appeal is pending"
+keywords = ["appeal"]
+
+[[traps]]
+name = "Not for use if you are single and want the short form (or can apply online faster)"
+keywords = ["short form", "apply online", "healthcare.gov"]

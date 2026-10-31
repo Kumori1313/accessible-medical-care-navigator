@@ -1,0 +1,58 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "advance-directive-california"
+reviewed = false
+document_type = ["advance health care directive", "advance directive", "power of attorney for health care", "health care directive"]
+notes = "California Probate Code 4701 statutory form: Part 1 agent, 2 instructions, 3 organ donation (optional), 4 primary physician (optional), 5 signature and witnesses, 6 special witness rule for skilled nursing facilities."
+
+ocr_must_contain = [
+  "ADVANCE HEALTH CARE DIRECTIVE",
+  "POWER OF ATTORNEY FOR HEALTH CARE",
+  "PART 1",
+  "PART 2",
+  "PART 3",
+  "(OPTIONAL)",
+  "witness",
+]
+
+[[sections]]
+title = "Part 1: power of attorney for health care (naming an agent)"
+keywords = ["part 1", "power of attorney", "agent", "alternate agent"]
+
+[[sections]]
+title = "Part 2: instructions for health care"
+keywords = ["part 2", "instructions", "end-of-life", "treatment", "other wishes"]
+
+[[sections]]
+title = "Part 3: organ and tissue donation (optional)"
+keywords = ["part 3", "donat", "organ"]
+required = false
+
+[[sections]]
+title = "Part 4: primary physician (optional)"
+keywords = ["part 4", "primary physician", "designate a physician"]
+required = false
+
+[[sections]]
+title = "Part 5: signature and witnesses"
+keywords = ["part 5", "witness", "signature", "sign and date"]
+required = true
+
+[[sections]]
+title = "Part 6: special witness rule for skilled nursing facility patients"
+keywords = ["part 6", "skilled nursing", "ombudsman", "patient advocate"]
+
+[[traps]]
+name = "Must be signed by two qualified witnesses or acknowledged before a notary public"
+keywords = ["two qualified witnesses", "notary", "two witnesses"]
+
+[[traps]]
+name = "You can revoke or replace the directive at any time"
+keywords = ["revoke", "replace", "cancel"]
+
+[[traps]]
+name = "Give copies of the signed form to your doctor and the people involved"
+keywords = ["copy", "copies"]
+
+[[traps]]
+name = "Some parts are optional"
+keywords = ["optional"]

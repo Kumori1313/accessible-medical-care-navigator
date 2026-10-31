@@ -1,0 +1,53 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+# Pages 2-4 of this PDF repeat the form, so only page 1 is scored.
+id = "cms-1500-claim-form"
+reviewed = false
+pages = [1]
+document_type = ["claim form", "health insurance claim", "cms-1500", "billing form"]
+notes = "A blank sample of the paper claim form that providers send to insurers. Not for patients to fill in. Known OCR weakness: the dense small print of item 21 (diagnosis) is garbled by Tesseract at 200 DPI, so that phrase is expected to be missed."
+
+ocr_must_contain = [
+  "HEALTH INSURANCE CLAIM FORM",
+  "INSURED'S I.D. NUMBER",
+  "PATIENT'S NAME",
+  "DIAGNOSIS OR NATURE OF ILLNESS OR INJURY",
+  "PRIOR AUTHORIZATION NUMBER",
+  "FEDERAL TAX I.D. NUMBER",
+  "SIGNATURE OF PHYSICIAN OR SUPPLIER",
+]
+
+[[sections]]
+title = "Patient information"
+keywords = ["patient's name", "patient name", "patient information", "patient's birth date", "patient's address"]
+
+[[sections]]
+title = "Insured (policyholder) information"
+keywords = ["insured", "policyholder", "policy holder", "policy group"]
+
+[[sections]]
+title = "Diagnosis"
+keywords = ["diagnosis", "illness or injury"]
+
+[[sections]]
+title = "Services provided and charges"
+keywords = ["services", "procedures", "total charge", "charges", "supplies"]
+
+[[sections]]
+title = "Prior authorization"
+keywords = ["prior authorization"]
+
+[[sections]]
+title = "Billing provider and tax ID"
+keywords = ["billing provider", "federal tax", "tax id", "tax i.d."]
+
+[[sections]]
+title = "Patient or authorized person's signature (release of information)"
+keywords = ["signature", "signed", "authorize the release", "release of any medical"]
+
+[[traps]]
+name = "Release of information: signing lets the insurer get medical information to process the claim"
+keywords = ["release", "authorize", "permission"]
+
+[[traps]]
+name = "This is a blank sample copy, not for filing a real claim"
+keywords = ["sample", "blank", "example", "not for filing", "template"]

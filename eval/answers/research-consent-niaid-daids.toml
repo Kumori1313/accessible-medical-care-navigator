@@ -1,0 +1,76 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "research-consent-niaid-daids"
+reviewed = false
+document_type = ["informed consent", "consent template", "consent form", "research consent", "sample informed consent"]
+notes = "NIAID DAIDS general-use sample informed consent TEMPLATE (v4, April 2025): instructions for authors, then the participant-facing consent text with bracketed placeholders. A good test of whether the explanation notices it is a template, not a signed form."
+
+ocr_must_contain = [
+  "INFORMED CONSENT TEMPLATE",
+  "FOR INFORMED CONSENT FORM (ICF) AUTHORS",
+  "What is the key information I should know about this study",
+  "What possible risks can I expect",
+  "Can I change my mind about participating",
+  "What are my rights and who should I contact",
+  "How do I confirm my decision to be in this study",
+]
+
+[[sections]]
+title = "Instructions for the people writing the consent form"
+keywords = ["instructions", "authors", "icf authors", "template", "investigators"]
+
+[[sections]]
+title = "Key information about the study"
+keywords = ["key information", "why are researchers", "purpose of the study", "why is this study"]
+
+[[sections]]
+title = "What you would do and how long it lasts"
+keywords = ["what will i need to do", "how long", "procedures", "study visits", "what will happen"]
+
+[[sections]]
+title = "Risks"
+keywords = ["risk"]
+
+[[sections]]
+title = "Benefits"
+keywords = ["benefit"]
+
+[[sections]]
+title = "Other choices (alternatives to joining)"
+keywords = ["other choices", "alternatives", "other options"]
+
+[[sections]]
+title = "Leaving the study / changing your mind"
+keywords = ["change my mind", "withdraw", "leave the study", "stop taking part", "leaving"]
+
+[[sections]]
+title = "Privacy and confidentiality of your information"
+keywords = ["confidential", "privacy", "information", "certificate of confidentiality"]
+
+[[sections]]
+title = "Costs and compensation"
+keywords = ["pay anything", "compensation", "costs", "payment", "reimburse"]
+
+[[sections]]
+title = "Your rights and who to contact"
+keywords = ["rights", "who should i contact", "questions", "contact"]
+
+[[sections]]
+title = "Confirming your decision (signature)"
+keywords = ["confirm my decision", "signature", "sign", "consent"]
+required = true
+
+[[traps]]
+name = "Taking part is voluntary; you do not have to participate"
+keywords = ["voluntary", "your choice", "do not have to participate", "don't have to"]
+
+[[traps]]
+name = "You can leave the study; other care you receive is not affected"
+keywords = ["change my mind", "leave", "withdraw", "other care"]
+
+[[traps]]
+name = "This is a template with placeholders, not a completed consent form"
+keywords = ["template", "placeholder", "sample", "authors", "fill in"]
+
+[[traps]]
+name = "Should be written at about an 8th grade reading level or lower"
+keywords = ["8th grade", "eighth grade", "reading level", "reading and comprehension"]

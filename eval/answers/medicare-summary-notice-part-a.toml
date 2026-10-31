@@ -1,0 +1,63 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "medicare-summary-notice-part-a"
+reviewed = false
+document_type = ["medicare summary notice", "msn", "medicare notice", "medicare claims summary"]
+notes = "A sample (fictional person) Part A notice with explanatory pages, dated Sept 15, 2020."
+
+ocr_must_contain = [
+  "THIS IS NOT A BILL",
+  "Medicare Summary Notice",
+  "Total You May Be Billed",
+  "Part A Deductible",
+  "How to Report Fraud",
+  "1-800-MEDICARE",
+  "How to Handle Denied Claims or File an Appeal",
+]
+
+[[sections]]
+title = "What you may be billed"
+keywords = ["total you may be billed", "may be billed", "you may owe", "amount you owe"]
+
+[[sections]]
+title = "Claims and costs this period"
+keywords = ["claims & costs", "claims and costs", "claims processed", "your claims"]
+
+[[sections]]
+title = "Deductible status"
+keywords = ["deductible"]
+
+[[sections]]
+title = "Benefit periods"
+keywords = ["benefit period", "benefit days"]
+
+[[sections]]
+title = "How to check the notice"
+keywords = ["how to check", "do you recognize", "check the dates", "double-check"]
+
+[[sections]]
+title = "How to report fraud"
+keywords = ["fraud"]
+
+[[sections]]
+title = "How to get help with questions"
+keywords = ["get help", "1-800-medicare", "questions", "ship"]
+
+[[sections]]
+title = "How to appeal a decision"
+keywords = ["appeal"]
+
+[[traps]]
+name = "This is not a bill"
+keywords = ["not a bill"]
+
+[[traps]]
+name = "Appeals must be received within 120 days"
+keywords = ["120 days", "120 calendar"]
+
+[[traps]]
+name = "Appeals must be in writing"
+keywords = ["in writing", "written appeal", "writing"]
+
+[[traps]]
+name = "Total you may be billed is $2,062.50"
+keywords = ["2,062.50", "2062.50"]

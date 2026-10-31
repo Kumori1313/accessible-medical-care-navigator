@@ -1,0 +1,67 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "vaccine-information-statement-flu"
+reviewed = false
+document_type = ["vaccine information statement", "flu vaccine", "influenza vaccine", "vaccine information"]
+notes = "CDC Vaccine Information Statement for inactivated/recombinant flu vaccine, hosted by immunize.org. A plain-language patient handout with seven numbered sections."
+
+ocr_must_contain = [
+  "VACCINE INFORMATION STATEMENT",
+  "Why get vaccinated",
+  "Talk with your health care provider",
+  "What if there is a serious problem",
+  "National Vaccine Injury Compensation Program",
+  "How can I learn more",
+  "1-800-232-4636",
+]
+
+[[sections]]
+title = "1. Why get vaccinated"
+keywords = ["why get vaccinated", "prevent influenza", "flu can", "contagious"]
+
+[[sections]]
+title = "2. Influenza vaccines (who and when)"
+keywords = ["influenza vaccines", "6 months", "every flu season", "doses"]
+
+[[sections]]
+title = "3. Talk with your health care provider (allergies, GBS)"
+keywords = ["talk with your", "allergic", "guillain"]
+
+[[sections]]
+title = "4. Risks of a vaccine reaction"
+keywords = ["risk", "reaction", "soreness", "side effect"]
+
+[[sections]]
+title = "5. What if there is a serious problem"
+keywords = ["serious problem", "9-1-1", "911", "vaers"]
+
+[[sections]]
+title = "6. Vaccine Injury Compensation Program"
+keywords = ["injury compensation", "compensation"]
+
+[[sections]]
+title = "7. How to learn more"
+keywords = ["learn more", "1-800-232-4636", "cdc-info", "health department"]
+
+[[traps]]
+name = "The flu vaccine does not cause the flu"
+keywords = ["does not cause flu", "doesn't cause", "does not cause the flu", "cannot cause", "can not cause"]
+
+[[traps]]
+name = "CDC recommends everyone 6 months and older get vaccinated every flu season"
+keywords = ["6 months and older", "everyone 6 months", "6 months or older"]
+
+[[traps]]
+name = "Tell the provider about severe allergic reactions or Guillain-Barre Syndrome"
+keywords = ["allergic", "guillain", "gbs"]
+
+[[traps]]
+name = "Call 9-1-1 for signs of a severe allergic reaction"
+keywords = ["9-1-1", "911", "emergency"]
+
+[[traps]]
+name = "Protection takes about 2 weeks to develop"
+keywords = ["2 weeks", "two weeks"]
+
+[[traps]]
+name = "Children 6 months to 8 years may need 2 doses in one season"
+keywords = ["2 doses", "two doses"]

@@ -1,0 +1,51 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "good-faith-estimate"
+reviewed = false
+document_type = ["good faith estimate", "estimate of expected charges", "no surprises act"]
+notes = "A provider-facing model template: instructions, then the blank patient-facing estimate. The instruction page says not to give the instructions to patients."
+
+ocr_must_contain = [
+  "Good Faith Estimate for Health Care Items and Services",
+  "No Surprises Act",
+  "Summary of Expected Charges",
+  "Patient Date of Birth",
+  "Primary Diagnosis Code",
+  "Total Expected Charges",
+  "dispute",
+]
+
+[[sections]]
+title = "Who must provide an estimate, and when"
+keywords = ["uninsured", "self-pay", "3 business days", "business days", "provider"]
+
+[[sections]]
+title = "Patient information and diagnosis"
+keywords = ["patient", "diagnosis"]
+
+[[sections]]
+title = "Summary and itemized list of expected charges"
+keywords = ["expected charges", "summary of expected", "itemized", "charges"]
+
+[[sections]]
+title = "Right to dispute a bill"
+keywords = ["dispute"]
+
+[[traps]]
+name = "The estimate is not a contract and does not require using these providers"
+keywords = ["not a contract", "no obligation", "does not require"]
+
+[[traps]]
+name = "Dispute eligibility: billed $400 or more above the estimate"
+keywords = ["$400", "400 or more", "400"]
+
+[[traps]]
+name = "Dispute process must be started within 120 calendar days of the bill"
+keywords = ["120 calendar", "120 days", "about 4 months"]
+
+[[traps]]
+name = "There is a $25 fee to use the dispute process"
+keywords = ["$25", "25 fee", "25 dollar"]
+
+[[traps]]
+name = "Estimate may not include unexpected costs from complications"
+keywords = ["unexpected", "unknown", "complications", "more if"]

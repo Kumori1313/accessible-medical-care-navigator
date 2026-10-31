@@ -1,0 +1,55 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+# Only page 1 is the patient registration form. Pages 2-4 of this PDF are an unrelated
+# "Electronic Health Record - User Registration" form for staff, so they are not scored.
+id = "intake-patient-registration"
+reviewed = false
+pages = [1]
+document_type = ["patient registration", "registration form", "intake form", "registration"]
+notes = "Military treatment facility registration form (blank, with some N/A fields for sponsor data)."
+
+ocr_must_contain = [
+  "PATIENT REGISTRATION FORM",
+  "Patient Information",
+  "Emergency Contact Information",
+  "Next-of-Kin Information",
+  "Sponsor Information",
+  "Other Health Insurance",
+  "Patient Signature",
+]
+
+[[sections]]
+title = "Patient information"
+keywords = ["patient information", "name", "date of birth", "dob", "address", "marital status", "ssn"]
+
+[[sections]]
+title = "Emergency contact"
+keywords = ["emergency contact"]
+
+[[sections]]
+title = "Next of kin"
+keywords = ["next-of-kin", "next of kin"]
+
+[[sections]]
+title = "Sponsor information (military)"
+keywords = ["sponsor"]
+
+[[sections]]
+title = "Other health insurance"
+keywords = ["other health insurance", "private health insurance", "dd form 2569", "insurance"]
+
+[[sections]]
+title = "Certification and signature"
+keywords = ["certify", "signature", "sign"]
+required = true
+
+[[traps]]
+name = "If you have private health insurance, complete DD Form 2569"
+keywords = ["dd form 2569", "2569"]
+
+[[traps]]
+name = "The completed form is emailed, and the email must be encrypted because it contains personal information"
+keywords = ["encrypt", "email"]
+
+[[traps]]
+name = "The form asks for sensitive personal details (SSN, religion, race, ethnicity)"
+keywords = ["ssn", "social security", "religio", "sensitive", "personal information", "pii"]

@@ -396,3 +396,20 @@ def test_cli_scaffold_writes_a_template_and_never_overwrites(eval_dir: Path) -> 
     (eval_dir / "forms" / "jpg" / "intake3-1.jpg").write_bytes(png("Hello Scaffold"))
     main(["--eval-dir", str(eval_dir), "scaffold", "intake3"])
     assert "Hello Scaffold" in (eval_dir / "answers" / "intake3.toml").read_text()
+
+
+# ---------- the committed answer keys ----------
+
+REPO = Path(__file__).resolve().parents[3]
+
+
+def test_committed_answer_keys_are_valid_and_documented() -> None:
+    keys = load_keys(REPO / "eval" / "answers")
+    assert keys, "expected answer keys in eval/answers"
+    manifest = (REPO / "eval" / "forms" / "MANIFEST.md").read_text()
+    for key_id, key in keys.items():
+        assert f"`{key_id}`" in manifest, f"{key_id} is not listed in eval/forms/MANIFEST.md"
+        assert key.document_type, f"{key_id}: needs document_type"
+        assert key.ocr_must_contain, f"{key_id}: needs ocr_must_contain"
+        assert key.sections, f"{key_id}: needs at least one section"
+        assert key.traps, f"{key_id}: needs at least one key fact"

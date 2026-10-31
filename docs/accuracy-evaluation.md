@@ -43,6 +43,13 @@ name = "An EOB is not a bill"
 keywords = ["not a bill"]
 ```
 
+## Current answer keys
+
+All 15 forms in `eval/forms/MANIFEST.md` have a key in `eval/answers/`. Every one is a **draft** (`reviewed = false`):
+they were written from each PDF's text layer (not from OCR), by a model, and have not been checked by a person.
+On clean renders OCR finds 98% of the listed phrases; the two misses (CMS-1500 item 21, the VA 10-5345 title)
+are recorded in those keys' notes and are real OCR weaknesses, not key errors.
+
 ## What is measured
 
 | Metric | Meaning |

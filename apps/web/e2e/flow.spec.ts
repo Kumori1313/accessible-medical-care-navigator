@@ -64,6 +64,10 @@ for (const scheme of ["light", "dark"] as const) {
 test("is fully operable by keyboard from the start", async ({ page }) => {
   await seedPreferences(page);
   await page.goto("/");
+  // Wait for the app to render first; pressing Tab before React mounts would race on slow machines.
+  await expect(
+    page.getByRole("heading", { name: "Understand my paperwork" }),
+  ).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("link", { name: "Skip to main content" }),

@@ -1,0 +1,66 @@
+# DRAFT key, written from the form's text layer. A person must verify it against the form.
+id = "hipaa-authorization-cms-10106"
+reviewed = false
+document_type = ["authorization", "release form", "permission to share", "disclose personal health information", "cms-10106"]
+notes = "Medicare form letting 1-800-MEDICARE share a person's information with others. Page 3 repeats the submission instructions."
+
+ocr_must_contain = [
+  "Authorization to Disclose Personal Health Information",
+  "Medicare Number",
+  "Check only one box",
+  "Medicare eligibility",
+  "Share my personal health information indefinitely",
+  "Personal Representative",
+  "1-800-MEDICARE Written Authorization Dept",
+]
+
+[[sections]]
+title = "Information about the person with Medicare"
+keywords = ["person with medicare", "medicare number", "date of birth", "your name", "about you"]
+
+[[sections]]
+title = "Who can receive the information"
+keywords = ["person/organization", "who can get", "name of each person", "organization"]
+
+[[sections]]
+title = "Which information to share (any or limited)"
+keywords = ["any information", "limited information", "which information", "what information", "types of"]
+
+[[sections]]
+title = "New York residents only"
+keywords = ["new york"]
+required = false
+
+[[sections]]
+title = "How long the authorization lasts"
+keywords = ["how long", "indefinitely", "start date", "end date", "expire"]
+
+[[sections]]
+title = "Reason for sharing"
+keywords = ["why", "reason", "at my request", "purpose"]
+
+[[sections]]
+title = "Signature"
+keywords = ["signature", "sign", "signed"]
+required = true
+
+[[sections]]
+title = "Personal representative"
+keywords = ["personal representative", "power of attorney"]
+required = false
+
+[[traps]]
+name = "You can cancel (revoke) the authorization at any time by writing to the address"
+keywords = ["revoke", "cancel", "change your mind"]
+
+[[traps]]
+name = "Information may no longer be protected by law once shared"
+keywords = ["no longer be protected", "no longer protected", "not be protected"]
+
+[[traps]]
+name = "Do not mail to the CMS Baltimore (PRA) address"
+keywords = ["do not mail", "baltimore", "7500 security"]
+
+[[traps]]
+name = "Mail it to the PO Box in Lawrence, KS, or submit online"
+keywords = ["lawrence", "po box 1270", "p.o. box 1270", "online", "medicare.gov account"]
