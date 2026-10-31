@@ -24,6 +24,7 @@ import {
 } from "@amcn/ui";
 import { useEffect, useRef, useState } from "react";
 import { HighlightedText } from "./HighlightedText";
+import { type DemoSample, DEMO_SAMPLES } from "./demo/samples";
 import { createIdbStorage, indexedDbAvailable } from "./idbStorage";
 import { Onboarding } from "./Onboarding";
 import { PwaNotices } from "./PwaNotices";
@@ -84,6 +85,9 @@ export function App({
   const [pendingTitle, setPendingTitle] = useState("");
   const [savedNotice, setSavedNotice] = useState("");
   const [fromSaved, setFromSaved] = useState(false);
+  // A built-in sample document is open: its text and explanation are bundled, so no server is needed.
+  const [sample, setSample] = useState<DemoSample | null>(null);
+  const [sampleExplained, setSampleExplained] = useState(false);
   const [step, setStep] = useState<Step>("choose");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
@@ -215,6 +219,24 @@ export function App({
     setStep("review");
   }
 
+  function startSample(s: DemoSample) {
+    setSample(s);
+    setSampleExplained(false);
+    setError("");
+    setOcr(s.ocr);
+    setText(s.ocr.text);
+    setStatus("");
+    setStep("review");
+  }
+
+  function startOver() {
+    setSample(null);
+    setSampleExplained(false);
+    setFromSaved(false);
+    setSavedNotice("");
+    setStep("choose");
+  }
+
   async function onRedact() {
     const result = await run("Removing personal details…", () =>
       api.redact(text),
@@ -230,6 +252,17 @@ export function App({
   }
 
   async function onExplain() {
+    // Untouched sample text gets its bundled explanation, with no network call.
+    if (sample && text === sample.ocr.text) {
+      setExplanation(sample.explanation);
+      setSampleExplained(true);
+      setSelected(0);
+      setError("");
+      setStatus("");
+      setStep("explained");
+      return;
+    }
+    setSampleExplained(false);
     const result = await run("Explaining your document…", () =>
       api.explain(text, prefs.readingLevel),
     );
@@ -304,6 +337,19 @@ export function App({
               </FileButton>{" "}
               <FileButton onFile={onFile}>Choose an image</FileButton>
             </div>
+            <h2>No document handy? Try a sample</h2>
+            <p>
+              These real public documents work without an internet connection.
+            </p>
+            <ul className="amcn-samples">
+              {DEMO_SAMPLES.map((s) => (
+                <li key={s.id}>
+                  <Button onPress={() => startSample(s)}>{s.title}</Button>
+                  <br />
+                  <small>{s.blurb}</small>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 
@@ -312,6 +358,11 @@ export function App({
             <h1 id="h-review" ref={heading} tabIndex={-1}>
               Check the text we read
             </h1>
+            {sample && (
+              <p role="note" className="amcn-banner">
+                <strong>Sample document.</strong> {sample.source}.
+              </p>
+            )}
             <ConfidenceBadge confidence={ocr.confidence} />
             {ocr.low_confidence && (
               <p>
@@ -345,13 +396,15 @@ export function App({
               </select>
             </p>
             <div className="amcn-actions">
-              <Button onPress={onRedact} isDisabled={busy || !text.trim()}>
-                Remove personal details
-              </Button>{" "}
+              {!sample && (
+                <Button onPress={onRedact} isDisabled={busy || !text.trim()}>
+                  Remove personal details
+                </Button>
+              )}{" "}
               <Button onPress={onExplain} isDisabled={busy || !text.trim()}>
                 Explain this document
               </Button>{" "}
-              <Button onPress={() => setStep("choose")} isDisabled={busy}>
+              <Button onPress={startOver} isDisabled={busy}>
                 Start over
               </Button>
             </div>
@@ -364,6 +417,13 @@ export function App({
               {explanation.document_type}
             </h1>
             <VerifyBanner />
+            {sampleExplained && (
+              <p role="note" className="amcn-banner">
+                <strong>Pre-written sample.</strong> This explanation was
+                written in advance so it works offline. Documents you add
+                yourself get a live explanation from the server.
+              </p>
+            )}
             <p>{explanation.summary}</p>
             <ReadAloud
               chunks={explanationToSpeech(explanation)}
@@ -430,15 +490,7 @@ export function App({
               {!fromSaved && (
                 <Button onPress={() => setStep("review")}>Back to text</Button>
               )}{" "}
-              <Button
-                onPress={() => {
-                  setFromSaved(false);
-                  setSavedNotice("");
-                  setStep("choose");
-                }}
-              >
-                Start over
-              </Button>
+              <Button onPress={startOver}>Start over</Button>
             </div>
           </section>
         )}
