@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..explain import Explanation, ExplanationError, ReadingLevel, explain_document
-from ..ocr import OcrResult, run_ocr
+from ..ocr import OcrResult, ocr_cache_tag, run_ocr
 from ..providers import LLMProvider
 from ..redaction import redact
 from . import metrics
@@ -95,7 +95,8 @@ class OcrCache:
     def run(self, data: bytes, ocr: OcrFn) -> OcrResult:
         if not self.directory:
             return ocr(data)
-        path = self.directory / f"{hashlib.sha256(data).hexdigest()}.json"
+        digest = hashlib.sha256(ocr_cache_tag().encode() + b"\0" + data).hexdigest()
+        path = self.directory / f"{digest}.json"
         if path.exists():
             cached = json.loads(path.read_text())
             return OcrResult(text=cached["text"], confidence=cached["confidence"])
